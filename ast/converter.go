@@ -29,6 +29,37 @@ const (
 	Uint64Type
 )
 
+func (ft FieldRefType) String() string {
+	switch ft {
+	case StringType:
+		return "String"
+	case BoolType:
+		return "Bool"
+	case FloatType:
+		return "Float"
+	case DoubleType:
+		return "Double"
+	case Int8Type:
+		return "Int8"
+	case Int16Type:
+		return "Int16"
+	case Int32Type:
+		return "Int32"
+	case Int64Type:
+		return "Int64"
+	case Uint8Type:
+		return "Uint8"
+	case Uint16Type:
+		return "Uint16"
+	case Uint32Type:
+		return "Uint32"
+	case Uint64Type:
+		return "Uint64"
+	default:
+		return "Unknown"
+	}
+}
+
 func RefTypeToFieldType(refType string) (FieldRefType, error) {
 	lower := strings.ToLower(refType)
 	switch {
@@ -86,7 +117,7 @@ func NewConverter(path string, IsLittleEndian bool) (*ArXMLConverter, error) {
 	for _, dt := range c.Parser.dtList {
 		switch {
 		case dt.TypReference != nil:
-			c.typeRefs[dt.TypReference.Ref] = dt.TypReference
+			c.typeRefs[fmt.Sprintf("/dataTypes/%s", dt.ShorName)] = dt.TypReference
 		case dt.Array != nil:
 			c.arrRefS[fmt.Sprintf("/dataTypes/%s", dt.ShorName)] = dt.Array
 		case dt.Structure != nil:
@@ -96,6 +127,15 @@ func NewConverter(path string, IsLittleEndian bool) (*ArXMLConverter, error) {
 		}
 	}
 	return c, nil
+}
+
+func (c *ArXMLConverter) Decode(data []byte, stName string) (interface{}, error) {
+	sts, ok := c.structRefs[fmt.Sprintf("/dataTypes/%s", stName)]
+	if !ok {
+		return nil, fmt.Errorf("struct ref not found: %s", stName)
+	}
+	v, _, err := c.ParseStructure(data, sts)
+	return v, err
 }
 
 func (c *ArXMLConverter) ParseStructure(data []byte, sts *Structure) (interface{}, []byte, error) {
@@ -203,7 +243,7 @@ func (c *ArXMLConverter) ParseTypReference(data []byte, t *TypReference) (interf
 	case Uint64Type:
 		return c.parseBytesToUint64(data)
 	}
-	return nil, nil, fmt.Errorf("unknown field type: %s", ft)
+	return nil, nil, fmt.Errorf("unknown field type: %s", ft.String())
 }
 
 func (c *ArXMLConverter) parseBytesToString(data []byte, strLen int64) (value string, remained []byte, err error) {
