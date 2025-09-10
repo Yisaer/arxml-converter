@@ -3,6 +3,7 @@ package ast
 import (
 	"encoding/binary"
 	"errors"
+	"fmt"
 	"unicode/utf16"
 )
 
@@ -168,6 +169,115 @@ func removePadding(data []byte, encoding StringEncoding) []byte {
 			data = data[:len(data)-2]
 		}
 	}
-
 	return data
+}
+
+func ParseBytesToDynamicString(data []byte) (value string, remained []byte, err error) {
+	// 1. 检查最小长度（4字节长度字段 + 最小BOM）
+	if len(data) < 6 { // 4字节长度 + 最小2字节BOM
+		return "", nil, errors.New("data too short for dynamic string")
+	}
+
+	// 2. 读取长度字段（4字节大端序）
+	length := binary.BigEndian.Uint32(data[0:4])
+	if length < 3 { // 最小长度：BOM(3) + 终止符(1)
+		return "", nil, errors.New("invalid length field")
+	}
+
+	// 3. 检查数据是否足够
+	if uint32(len(data)-4) < length {
+		return "", nil, fmt.Errorf("data truncated, need %d bytes, got %d", length, len(data)-4)
+	}
+
+	// 4. 提取字符串负载（包含BOM和终止符）
+	payload := data[4 : 4+int(length)]
+
+	// 5. 解析BOM
+	encoding, bomLen := detectEncodingFromBOM(data)
+	if encoding == EncodingUnknown {
+		return "", nil, errors.New("fixed-length string must start with BOM")
+	}
+
+	// 6. 提取内容（移除BOM和终止符）
+	content, err := extractContent(payload[bomLen:], encoding)
+	if err != nil {
+		return "", nil, err
+	}
+
+	// 7. 转换为字符串
+	str, err := convertToString(content, encoding)
+	if err != nil {
+		return "", nil, err
+	}
+
+	// 8. 返回结果
+	return str, data[4+int(length):], nil
+}
+
+// 检测编码类型和BOM长度
+func detectEncoding(data []byte) (encoding string, bomLen int, err error) {
+	if len(data) >= 3 && data[0] == 0xEF && data[1] == 0xBB && data[2] == 0xBF {
+		return "UTF-8", 3, nil
+	}
+	if len(data) >= 2 && data[0] == 0xFE && data[1] == 0xFF {
+		return "UTF-16BE", 2, nil
+	}
+	if len(data) >= 2 && data[0] == 0xFF && data[1] == 0xFE {
+		return "UTF-16LE", 2, nil
+	}
+	return "", 0, errors.New("unknown or missing BOM")
+}
+
+// 提取内容（移除终止符）
+func extractContent(data []byte, encoding StringEncoding) ([]byte, error) {
+	termLen := getTerminatorLength(encoding)
+	if len(data) < termLen {
+		return nil, fmt.Errorf("data too short for terminator (%d bytes needed)", termLen)
+	}
+
+	// 检查终止符
+	if !checkTerminator(data[len(data)-termLen:], encoding) {
+		return nil, errors.New("invalid terminator")
+	}
+
+	return data[:len(data)-termLen], nil
+}
+
+// 转换为字符串
+func convertToString(data []byte, encoding StringEncoding) (string, error) {
+	switch encoding {
+	case EncodingUTF8:
+		return string(data), nil
+	case EncodingUTF16BE:
+		return utf16ToString(data, binary.BigEndian)
+	case EncodingUTF16LE:
+		return utf16ToString(data, binary.LittleEndian)
+	default:
+		return "", fmt.Errorf("unsupported encoding: %s", encoding)
+	}
+}
+
+// UTF-16转换辅助函数
+func utf16ToString(data []byte, order binary.ByteOrder) (string, error) {
+	if len(data)%2 != 0 {
+		return "", errors.New("UTF-16 data length must be even")
+	}
+
+	u16s := make([]uint16, len(data)/2)
+	for i := range u16s {
+		u16s[i] = order.Uint16(data[2*i : 2*i+2])
+	}
+	return string(utf16.Decode(u16s)), nil
+}
+
+// 检查终止符
+func checkTerminator(data []byte, encoding StringEncoding) bool {
+	switch encoding {
+	case EncodingUTF8:
+		return len(data) >= 1 && data[0] == 0x00
+	case EncodingUTF16BE, EncodingUTF16LE:
+		return len(data) >= 2 && data[0] == 0x00 && data[1] == 0x00
+	default:
+		return false
+	}
 }
