@@ -1,4 +1,4 @@
-package ast
+package converter
 
 import (
 	"encoding/binary"
@@ -85,7 +85,7 @@ func TestParseBytesToFixedLengthString(t *testing.T) {
 		testData := []byte{
 			0xEF, 0xBB, 0xBF, // UTF-8 BOM
 			0x48, 0x69, // "Hi"
-			0x00, // UTF-8 终止符
+			0x00,                   // UTF-8 终止符
 			0x00, 0x00, 0x00, 0x00, // 填充字节
 		}
 
@@ -176,7 +176,7 @@ func TestParseBytesToFixedLengthString(t *testing.T) {
 		testData := []byte{
 			0xEF, 0xBB, 0xBF, // UTF-8 BOM
 			0x48, 0x65, 0x6C, 0x6C, 0x6F, // "Hello"
-			0x00, // UTF-8 终止符
+			0x00,             // UTF-8 终止符
 			0xFF, 0xFF, 0xFF, // 剩余数据
 		}
 
@@ -332,7 +332,7 @@ func TestParseBytesToDynamicString(t *testing.T) {
 			0x00, 0x00, 0x00, 0x0A, // 长度字段 (10字节)
 			0xEF, 0xBB, 0xBF, // UTF-8 BOM
 			0x48, 0x69, // "Hi"
-			0x00, // UTF-8 终止符
+			0x00,                   // UTF-8 终止符
 			0x00, 0x00, 0x00, 0x00, // 填充字节
 		}
 

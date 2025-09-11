@@ -1,10 +1,12 @@
-package ast
+package converter
 
 import (
 	"encoding/binary"
 	"fmt"
 	"math"
 	"strings"
+
+	"arxml-converter/ast"
 )
 
 type ParseAble interface {
@@ -91,38 +93,39 @@ func RefTypeToFieldType(refType string) (FieldRefType, error) {
 }
 
 type ArXMLConverter struct {
-	Parser         *Parser
+	Parser         *ast.Parser
 	IsLittleEndian bool
-	typeRefs       map[string]*TypReference
-	arrRefS        map[string]*Array
-	structRefs     map[string]*Structure
+	typeRefs       map[string]*ast.TypReference
+	arrRefS        map[string]*ast.Array
+	structRefs     map[string]*ast.Structure
 }
 
 func NewConverter(path string, IsLittleEndian bool) (*ArXMLConverter, error) {
-	parser, err := NewParser(path)
+	parser, err := ast.NewParser(path)
 	if err != nil {
 		return nil, err
 	}
 	c := &ArXMLConverter{
 		Parser:         parser,
 		IsLittleEndian: IsLittleEndian,
-		typeRefs:       make(map[string]*TypReference),
-		arrRefS:        make(map[string]*Array),
-		structRefs:     make(map[string]*Structure),
+		typeRefs:       make(map[string]*ast.TypReference),
+		arrRefS:        make(map[string]*ast.Array),
+		structRefs:     make(map[string]*ast.Structure),
 	}
 	if err := c.Parser.Parse(); err != nil {
 		return nil, err
 	}
-	for _, dt := range c.Parser.dtList {
+	for _, dt := range c.Parser.DtList {
+		key := fmt.Sprintf("/dataTypes/%s", dt.ShorName)
 		switch {
 		case dt.TypReference != nil:
-			c.typeRefs[fmt.Sprintf("/dataTypes/%s", dt.ShorName)] = dt.TypReference
+			c.typeRefs[key] = dt.TypReference
 		case dt.Array != nil:
-			c.arrRefS[fmt.Sprintf("/dataTypes/%s", dt.ShorName)] = dt.Array
+			c.arrRefS[key] = dt.Array
 		case dt.Structure != nil:
-			c.structRefs[fmt.Sprintf("/dataTypes/%s", dt.ShorName)] = dt.Structure
+			c.structRefs[key] = dt.Structure
 		default:
-			return nil, fmt.Errorf("unknown dt: %s", dt.ShorName)
+			return nil, fmt.Errorf("unknown dt: %s, not found: %v", dt.ShorName, key)
 		}
 	}
 	return c, nil
@@ -137,7 +140,7 @@ func (c *ArXMLConverter) Decode(data []byte, stName string) (interface{}, error)
 	return v, err
 }
 
-func (c *ArXMLConverter) ParseStructure(data []byte, sts *Structure) (interface{}, []byte, error) {
+func (c *ArXMLConverter) ParseStructure(data []byte, sts *ast.Structure) (interface{}, []byte, error) {
 	m := make(map[string]interface{})
 	var v interface{}
 	var err error
@@ -172,7 +175,7 @@ func (c *ArXMLConverter) ParseStructure(data []byte, sts *Structure) (interface{
 	return m, remainData, nil
 }
 
-func (c *ArXMLConverter) ParseArray(data []byte, array *Array) (interface{}, []byte, error) {
+func (c *ArXMLConverter) ParseArray(data []byte, array *ast.Array) (interface{}, []byte, error) {
 	targets := make([]interface{}, 0)
 	var v interface{}
 	var err error
@@ -211,7 +214,7 @@ func (c *ArXMLConverter) ParseArray(data []byte, array *Array) (interface{}, []b
 	return targets, remainData, nil
 }
 
-func (c *ArXMLConverter) ParseTypReference(data []byte, t *TypReference) (interface{}, []byte, error) {
+func (c *ArXMLConverter) ParseTypReference(data []byte, t *ast.TypReference) (interface{}, []byte, error) {
 	ft, err := RefTypeToFieldType(t.Ref)
 	if err != nil {
 		return nil, nil, err

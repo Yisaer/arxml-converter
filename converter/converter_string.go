@@ -1,4 +1,4 @@
-package ast
+package converter
 
 import (
 	"encoding/binary"
@@ -248,22 +248,22 @@ func inferEncodingFromContent(data []byte) StringEncoding {
 	// 检查是否为UTF-16模式
 	// UTF-16BE: 高字节在前，低字节在后，且低字节通常为0x00（ASCII字符）
 	// UTF-16LE: 低字节在前，高字节在后，且高字节通常为0x00（ASCII字符）
-	
+
 	// 检查前几个字符的模式
 	utf16BECount := 0
 	utf16LECount := 0
-	
+
 	// 检查前几个字符（最多检查前20个字节）
 	maxCheck := len(data)
 	if maxCheck > 20 {
 		maxCheck = 20
 	}
-	
+
 	for i := 0; i < maxCheck-1; i += 2 {
 		if i+1 >= len(data) {
 			break
 		}
-		
+
 		// UTF-16BE模式：高字节非零，低字节为零（ASCII字符）
 		if data[i] != 0x00 && data[i+1] == 0x00 {
 			utf16BECount++
@@ -273,7 +273,7 @@ func inferEncodingFromContent(data []byte) StringEncoding {
 			utf16LECount++
 		}
 	}
-	
+
 	// 根据模式数量判断编码
 	if utf16BECount > utf16LECount {
 		return EncodingUTF16BE
@@ -281,7 +281,7 @@ func inferEncodingFromContent(data []byte) StringEncoding {
 	if utf16LECount > utf16BECount {
 		return EncodingUTF16LE
 	}
-	
+
 	// 默认返回UTF-8
 	return EncodingUTF8
 }
