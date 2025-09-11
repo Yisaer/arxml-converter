@@ -13,7 +13,7 @@ type Parser struct {
 	Doc               *etree.Document
 	ArPackageElements []*etree.Element
 	dataTypesElement  *etree.Element
-	dtList            []*DataType
+	DtList            []*DataType
 }
 
 func NewParser(path string) (*Parser, error) {
@@ -22,7 +22,7 @@ func NewParser(path string) (*Parser, error) {
 		return nil, err
 	}
 	p := &Parser{Path: path, Doc: doc}
-	p.dtList = make([]*DataType, 0)
+	p.DtList = make([]*DataType, 0)
 	return p, nil
 }
 
@@ -57,21 +57,24 @@ func (p *Parser) searchDataTypes() error {
 			return nil
 		}
 	}
-	return fmt.Errorf("no dataTypes")
+	return fmt.Errorf("no dataTypes find in ar package")
 }
 
 func (p *Parser) ParseDataTypes() error {
 	eles := p.dataTypesElement.SelectElement("ELEMENTS")
 	if eles == nil {
-		return fmt.Errorf("no ELEMENTS")
+		return fmt.Errorf("no ELEMENTS in datatypes arpackage")
 	}
 	dataTypes := eles.SelectElements("STD-CPP-IMPLEMENTATION-DATA-TYPE")
-	for _, dataType := range dataTypes {
+	if len(dataTypes) < 1 {
+		return fmt.Errorf("no STD-CPP-IMPLEMENTATION-DATA-TYPE in elements datatypes arpackage")
+	}
+	for index, dataType := range dataTypes {
 		dt, err := p.parseDataType(dataType)
 		if err != nil {
-			return err
+			return fmt.Errorf("index %d STD-CPP-IMPLEMENTATION-DATA-TYPE has err:%v", index, err.Error())
 		}
-		p.dtList = append(p.dtList, dt)
+		p.DtList = append(p.DtList, dt)
 	}
 	return nil
 }
@@ -80,25 +83,25 @@ func (p *Parser) parseDataType(d *etree.Element) (*DataType, error) {
 	dt := &DataType{}
 	sn := d.SelectElement("SHORT-NAME")
 	if sn == nil {
-		return nil, fmt.Errorf("no SHORT-NAME")
+		return nil, fmt.Errorf("no SHORT-NAME in %v", d.Text())
 	}
 	dt.ShorName = sn.Text()
 	category := d.SelectElement("CATEGORY")
 	if category == nil {
-		return nil, fmt.Errorf("no CATEGORY")
+		return nil, fmt.Errorf("no CATEGORY in %v", d.Text())
 	}
 	dt.Category = category.Text()
 	switch dt.Category {
 	case "TYPE_REFERENCE":
 		ref := d.SelectElement("TYPE-REFERENCE-REF")
 		if ref == nil {
-			return nil, fmt.Errorf("no REFERENCE-REF")
+			return nil, fmt.Errorf("no TYPE-REFERENCE-REF")
 		}
 		dt.TypReference = &TypReference{Ref: ref.Text()}
 		if strings.Contains(strings.ToLower(dt.TypReference.Ref), "string") {
 			stringSize := d.SelectElement("ARRAY-SIZE")
 			if stringSize == nil {
-				return nil, fmt.Errorf("no string ARRAY-SIZE")
+				return nil, fmt.Errorf("no ARRAY-SIZE for TYPE-REFERENCE-REF string")
 			}
 			as, err := strconv.ParseInt(stringSize.Text(), 10, 64)
 			if err != nil {
@@ -121,7 +124,7 @@ func (p *Parser) parseDataType(d *etree.Element) (*DataType, error) {
 		}
 		cppArgs := args.SelectElement("CPP-TEMPLATE-ARGUMENT")
 		if cppArgs == nil {
-			return nil, fmt.Errorf("no CPP-TEMPLATE-ARGUMENT")
+			return nil, fmt.Errorf("no CPP-TEMPLATE-ARGUMENT in TEMPLATE-ARGUMENTS")
 		}
 		inPlace := cppArgs.SelectElement("INPLACE")
 		if inPlace == nil {
@@ -133,7 +136,7 @@ func (p *Parser) parseDataType(d *etree.Element) (*DataType, error) {
 		}
 		typRef := cppArgs.SelectElement("TEMPLATE-TYPE-REF")
 		if typRef == nil {
-			return nil, fmt.Errorf("no TEMPLATE-TYPE-REF")
+			return nil, fmt.Errorf("no TEMPLATE-TYPE-REF in CPP-TEMPLATE-ARGUMENT")
 		}
 		dt.Array = &Array{
 			ArraySize: as,
@@ -208,7 +211,7 @@ func (p *Parser) ParseStructure(dt *DataType, d *etree.Element) error {
 		}
 		trd := typRef.SelectElement("TYPE-REFERENCE-REF")
 		if trd == nil {
-			return fmt.Errorf("no TYPE-REFERENCE-REF")
+			return fmt.Errorf("no TYPE-REFERENCE-REF in TYPE-REFERENCE")
 		}
 		str.ShorName = sn.Text()
 		str.InPlace = ip
