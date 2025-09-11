@@ -2,7 +2,6 @@ package ast
 
 import (
 	"encoding/binary"
-	"errors"
 	"fmt"
 	"math"
 	"strings"
@@ -219,7 +218,10 @@ func (c *ArXMLConverter) ParseTypReference(data []byte, t *TypReference) (interf
 	}
 	switch ft {
 	case StringType:
-		return c.parseBytesToString(data, t.StringSize)
+		if t.StringSize > 0 {
+			return parseBytesToFixedLengthString(data, int(t.StringSize))
+		}
+		return ParseBytesToDynamicString(data)
 	case BoolType:
 		return c.parseBytesToBoolean(data)
 	case FloatType:
@@ -244,16 +246,6 @@ func (c *ArXMLConverter) ParseTypReference(data []byte, t *TypReference) (interf
 		return c.parseBytesToUint64(data)
 	}
 	return nil, nil, fmt.Errorf("unknown field type: %s", ft.String())
-}
-
-func (c *ArXMLConverter) parseBytesToString(data []byte, strLen int64) (value string, remained []byte, err error) {
-	if len(data) < 4 {
-		return "", nil, fmt.Errorf("expect data len larger than %v got len %v", 4, len(data))
-	}
-	if int64(len(remained)) < strLen {
-		return "", nil, errors.New("data truncated, insufficient bytes for string")
-	}
-	return string(remained[:strLen]), remained[strLen:], nil
 }
 
 func (c *ArXMLConverter) parseBytesToBoolean(data []byte) (bool, []byte, error) {
