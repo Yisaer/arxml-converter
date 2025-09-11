@@ -72,14 +72,6 @@ func RefTypeToFieldType(refType string) (FieldRefType, error) {
 		return FloatType, nil
 	case strings.Contains(lower, "double"):
 		return DoubleType, nil
-	case strings.Contains(lower, "int8"):
-		return Int8Type, nil
-	case strings.Contains(lower, "int16"):
-		return Int16Type, nil
-	case strings.Contains(lower, "int32"):
-		return Int32Type, nil
-	case strings.Contains(lower, "int64"):
-		return Int64Type, nil
 	case strings.Contains(lower, "uint8"):
 		return Uint8Type, nil
 	case strings.Contains(lower, "uint16"):
@@ -88,6 +80,14 @@ func RefTypeToFieldType(refType string) (FieldRefType, error) {
 		return Uint32Type, nil
 	case strings.Contains(lower, "uint64"):
 		return Uint64Type, nil
+	case strings.Contains(lower, "int8"):
+		return Int8Type, nil
+	case strings.Contains(lower, "int16"):
+		return Int16Type, nil
+	case strings.Contains(lower, "int32"):
+		return Int32Type, nil
+	case strings.Contains(lower, "int64"):
+		return Int64Type, nil
 	}
 	return StringType, fmt.Errorf("unknown field type: %s", refType)
 }
