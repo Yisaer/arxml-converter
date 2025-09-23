@@ -97,20 +97,29 @@ func NewConverter(path string, config converter.IDlConverterConfig) (*ArXMLConve
 	return c, nil
 }
 
-func (c *ArXMLConverter) GetTypeByID(serviceID, eventID int) (string, error) {
+func (c *ArXMLConverter) DecodeWithID(serviceID, eventID int, data []byte) (interface{}, error) {
+	t, err := c.GetTypeByID(serviceID, eventID)
+	if err != nil {
+		return nil, err
+	}
+	result, _, err := c.idlConverter.ParseDataByType(data, t, *c.idlModule, true)
+	return result, err
+}
+
+func (c *ArXMLConverter) GetTypeByID(serviceID, eventID int) (typeref.TypeRef, error) {
 	svc, ok := c.Parser.Services[serviceID]
 	if !ok {
-		return "", fmt.Errorf("service %v not found", serviceID)
+		return nil, fmt.Errorf("service %v not found", serviceID)
 	}
 	event, ok := svc.Events[eventID]
 	if !ok {
-		return "", fmt.Errorf("event %v not found", eventID)
+		return nil, fmt.Errorf("event %v not found", eventID)
 	}
 	t, ok := c.convertedTypeRefs[strings.ToLower(event.ShortName)]
 	if !ok {
-		return "", fmt.Errorf("not found type ref %v for event id %v", event.ShortName, event.EventID)
+		return nil, fmt.Errorf("not found type ref %v for event id %v", event.ShortName, event.EventID)
 	}
-	return t.TypeName(), nil
+	return t, nil
 }
 
 // GetConvertedTypeRef 获取转换后的 TypeRef

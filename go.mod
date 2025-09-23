@@ -7,7 +7,7 @@ toolchain go1.24.5
 require (
 	github.com/beevik/etree v1.6.0
 	github.com/stretchr/testify v1.11.1
-	github.com/yisaer/idl-parser v0.0.11
+	github.com/yisaer/idl-parser v0.0.12
 )
 
 require (
@@ -16,5 +16,3 @@ require (
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
-
-replace github.com/yisaer/idl-parser => /Users/yisa/Downloads/Github/idlparser

@@ -19,7 +19,7 @@ func (c *ArXMLConverter) TransformToIDLModule() (*idlAst.Module, error) {
 			if err != nil {
 				return nil, fmt.Errorf("failed to convert structure %s: %w", dt.ShorName, err)
 			}
-			content = append(content, structContent)
+			content = append(content, *structContent)
 		}
 	}
 
@@ -65,9 +65,6 @@ func (c *ArXMLConverter) transformField(strField *ast.StructureTypRef) (typeref.
 
 // createTypeRef 根据引用字符串创建对应的 TypeRef
 func (c *ArXMLConverter) createTypeRef(ref string) (typeref.TypeRef, error) {
-	if strings.Contains(ref, "AppSrv_Inputkey") {
-		fmt.Println("here")
-	}
 	typeName := c.extractTypeName(ref)
 
 	t, ok := c.convertedTypeRefs[strings.ToLower(typeName)]
