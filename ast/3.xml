@@ -1,0 +1,419 @@
+<AR-PACKAGE>
+    <SHORT-NAME>IAUTOSAR</SHORT-NAME>
+    <ELEMENTS>
+        <SOMEIP-SERVICE-INTERFACE-DEPLOYMENT UUID="3d1024af-48a1-4a61-bdf5-fb94200a6c2f">
+            <SHORT-NAME>SceneMode_Someip_Deployment</SHORT-NAME>
+            <EVENT-DEPLOYMENTS>
+                <SOMEIP-EVENT-DEPLOYMENT UUID="b8cc37dd-d459-4261-b655-e12a32b9fd45">
+                    <SHORT-NAME>sceneModePowerOnSts</SHORT-NAME>
+                    <EVENT-REF DEST="VARIABLE-DATA-PROTOTYPE">/interfaces/SceneMode/sceneModePowerOnSts</EVENT-REF>
+                    <EVENT-ID>32769</EVENT-ID>
+                    <TRANSPORT-PROTOCOL>TCP</TRANSPORT-PROTOCOL>
+                </SOMEIP-EVENT-DEPLOYMENT>
+                <SOMEIP-EVENT-DEPLOYMENT UUID="69fa0a98-8691-4139-96b3-a2dbe2d012e6">
+                    <SHORT-NAME>sentryModeSuppress</SHORT-NAME>
+                    <EVENT-REF DEST="VARIABLE-DATA-PROTOTYPE">/interfaces/SceneMode/sentryModeSuppress</EVENT-REF>
+                    <EVENT-ID>32770</EVENT-ID>
+                    <TRANSPORT-PROTOCOL>TCP</TRANSPORT-PROTOCOL>
+                </SOMEIP-EVENT-DEPLOYMENT>
+            </EVENT-DEPLOYMENTS>
+            <FIELD-DEPLOYMENTS>
+                <SOMEIP-FIELD-DEPLOYMENT UUID="cb81acc2-7387-43de-b429-142d14ada1e5">
+                    <SHORT-NAME>sceneMode_cfgPara</SHORT-NAME>
+                    <FIELD-REF DEST="FIELD">/interfaces/SceneMode/sceneMode_cfgPara</FIELD-REF>
+                    <GET UUID="7d130088-1e30-4b3f-8cb3-09c6069f7d26">
+                        <SHORT-NAME>sceneMode_cfgPara_Getter</SHORT-NAME>
+                        <METHOD-ID>4097</METHOD-ID>
+                        <TRANSPORT-PROTOCOL>TCP</TRANSPORT-PROTOCOL>
+                    </GET>
+                    <NOTIFIER UUID="c3f4d111-7fae-48b2-a92e-75db6e7e96b5">
+                        <SHORT-NAME>sceneMode_cfgPara_Notify</SHORT-NAME>
+                        <EVENT-ID>36865</EVENT-ID>
+                        <SERIALIZER>SOMEIP</SERIALIZER>
+                        <TRANSPORT-PROTOCOL>TCP</TRANSPORT-PROTOCOL>
+                    </NOTIFIER>
+                </SOMEIP-FIELD-DEPLOYMENT>
+            </FIELD-DEPLOYMENTS>
+            <METHOD-DEPLOYMENTS>
+                <SOMEIP-METHOD-DEPLOYMENT UUID="7a190b5c-29b5-4988-b7a9-f93683eeaf88">
+                    <SHORT-NAME>setCfgPara</SHORT-NAME>
+                    <METHOD-REF DEST="CLIENT-SERVER-OPERATION">/interfaces/SceneMode/setCfgPara</METHOD-REF>
+                    <METHOD-ID>1</METHOD-ID>
+                    <TRANSPORT-PROTOCOL>TCP</TRANSPORT-PROTOCOL>
+                </SOMEIP-METHOD-DEPLOYMENT>
+            </METHOD-DEPLOYMENTS>
+            <SERVICE-INTERFACE-REF DEST="SERVICE-INTERFACE">/interfaces/SceneMode</SERVICE-INTERFACE-REF>
+            <EVENT-GROUPS>
+                <SOMEIP-EVENT-GROUP UUID="ca265d86-bb81-41a7-ae2b-8f4386ac3834">
+                    <SHORT-NAME>SceneMode_1_EventGroup</SHORT-NAME>
+                    <EVENT-GROUP-ID>1</EVENT-GROUP-ID>
+                    <EVENT-REFS>
+                        <EVENT-REF DEST="SOMEIP-EVENT-DEPLOYMENT">/IAUTOSAR/SceneMode_Someip_Deployment/sceneModePowerOnSts</EVENT-REF>
+                        <EVENT-REF DEST="SOMEIP-EVENT-DEPLOYMENT">/IAUTOSAR/SceneMode_Someip_Deployment/sentryModeSuppress</EVENT-REF>
+                        <EVENT-REF DEST="SOMEIP-EVENT-DEPLOYMENT">/IAUTOSAR/SceneMode_Someip_Deployment/sceneMode_cfgPara/sceneMode_cfgPara_Notify</EVENT-REF>
+                    </EVENT-REFS>
+                </SOMEIP-EVENT-GROUP>
+            </EVENT-GROUPS>
+            <SERVICE-INTERFACE-ID>22530</SERVICE-INTERFACE-ID>
+            <SERVICE-INTERFACE-VERSION>
+                <MAJOR-VERSION>1</MAJOR-VERSION>
+                <MINOR-VERSION>1</MINOR-VERSION>
+            </SERVICE-INTERFACE-VERSION>
+        </SOMEIP-SERVICE-INTERFACE-DEPLOYMENT>
+        <SOMEIP-SERVICE-INTERFACE-DEPLOYMENT UUID="92a1d436-4a62-4461-a125-d642e6b7d17a">
+            <SHORT-NAME>IVI_IPDU_Data_Someip_Deployment</SHORT-NAME>
+            <EVENT-DEPLOYMENTS>
+                <SOMEIP-EVENT-DEPLOYMENT UUID="5e31e35f-a92b-424a-9f0e-d8643d50373f">
+                    <SHORT-NAME>notifyIVIData</SHORT-NAME>
+                    <EVENT-REF DEST="VARIABLE-DATA-PROTOTYPE">/interfaces/IVI_IPDU_Data/notifyIVIData</EVENT-REF>
+                    <EVENT-ID>32769</EVENT-ID>
+                    <TRANSPORT-PROTOCOL>TCP</TRANSPORT-PROTOCOL>
+                </SOMEIP-EVENT-DEPLOYMENT>
+                <SOMEIP-EVENT-DEPLOYMENT UUID="05d4ca9a-00c9-4443-9720-11112d62ec22">
+                    <SHORT-NAME>notifyIC_Mileage</SHORT-NAME>
+                    <EVENT-REF DEST="VARIABLE-DATA-PROTOTYPE">/interfaces/IVI_IPDU_Data/notifyIC_Mileage</EVENT-REF>
+                    <EVENT-ID>32770</EVENT-ID>
+                    <TRANSPORT-PROTOCOL>TCP</TRANSPORT-PROTOCOL>
+                </SOMEIP-EVENT-DEPLOYMENT>
+                <SOMEIP-EVENT-DEPLOYMENT UUID="5a7b253e-c130-4f8e-b5d8-75516ff44997">
+                    <SHORT-NAME>notifyIC_MileageValid</SHORT-NAME>
+                    <EVENT-REF DEST="VARIABLE-DATA-PROTOTYPE">/interfaces/IVI_IPDU_Data/notifyIC_MileageValid</EVENT-REF>
+                    <EVENT-ID>32771</EVENT-ID>
+                    <TRANSPORT-PROTOCOL>TCP</TRANSPORT-PROTOCOL>
+                </SOMEIP-EVENT-DEPLOYMENT>
+                <SOMEIP-EVENT-DEPLOYMENT UUID="3dce9ae3-b5dc-4c62-b180-8735d79b4d5a">
+                    <SHORT-NAME>notifyEMS_fuelComsump100ms</SHORT-NAME>
+                    <EVENT-REF DEST="VARIABLE-DATA-PROTOTYPE">/interfaces/IVI_IPDU_Data/notifyEMS_fuelComsump100ms</EVENT-REF>
+                    <EVENT-ID>32772</EVENT-ID>
+                    <TRANSPORT-PROTOCOL>TCP</TRANSPORT-PROTOCOL>
+                </SOMEIP-EVENT-DEPLOYMENT>
+                <SOMEIP-EVENT-DEPLOYMENT UUID="62c7a767-c009-40d9-8fcd-88feea7b20e2">
+                    <SHORT-NAME>notifyEMS_engine_status</SHORT-NAME>
+                    <EVENT-REF DEST="VARIABLE-DATA-PROTOTYPE">/interfaces/IVI_IPDU_Data/notifyEMS_engine_status</EVENT-REF>
+                    <EVENT-ID>32773</EVENT-ID>
+                    <TRANSPORT-PROTOCOL>TCP</TRANSPORT-PROTOCOL>
+                </SOMEIP-EVENT-DEPLOYMENT>
+                <SOMEIP-EVENT-DEPLOYMENT UUID="496cf473-4dba-4fbb-9b26-2788460b453e">
+                    <SHORT-NAME>notifyEMS_engCoolantTemp</SHORT-NAME>
+                    <EVENT-REF DEST="VARIABLE-DATA-PROTOTYPE">/interfaces/IVI_IPDU_Data/notifyEMS_engCoolantTemp</EVENT-REF>
+                    <EVENT-ID>32774</EVENT-ID>
+                    <TRANSPORT-PROTOCOL>TCP</TRANSPORT-PROTOCOL>
+                </SOMEIP-EVENT-DEPLOYMENT>
+                <SOMEIP-EVENT-DEPLOYMENT UUID="6d754de7-6846-4fbb-84f5-c6d276a22642">
+                    <SHORT-NAME>notifyEMS_engSpeed</SHORT-NAME>
+                    <EVENT-REF DEST="VARIABLE-DATA-PROTOTYPE">/interfaces/IVI_IPDU_Data/notifyEMS_engSpeed</EVENT-REF>
+                    <EVENT-ID>32775</EVENT-ID>
+                    <TRANSPORT-PROTOCOL>TCP</TRANSPORT-PROTOCOL>
+                </SOMEIP-EVENT-DEPLOYMENT>
+                <SOMEIP-EVENT-DEPLOYMENT UUID="bbe29323-6579-4ffe-9e8b-147c364f18f6">
+                    <SHORT-NAME>notifyBCM_PowerState</SHORT-NAME>
+                    <EVENT-REF DEST="VARIABLE-DATA-PROTOTYPE">/interfaces/IVI_IPDU_Data/notifyBCM_PowerState</EVENT-REF>
+                    <EVENT-ID>32776</EVENT-ID>
+                    <TRANSPORT-PROTOCOL>TCP</TRANSPORT-PROTOCOL>
+                </SOMEIP-EVENT-DEPLOYMENT>
+                <SOMEIP-EVENT-DEPLOYMENT UUID="4f9453b7-5ce3-4a47-bb23-205164793423">
+                    <SHORT-NAME>notifyNaviEna</SHORT-NAME>
+                    <EVENT-REF DEST="VARIABLE-DATA-PROTOTYPE">/interfaces/IVI_IPDU_Data/notifyNaviEna</EVENT-REF>
+                    <EVENT-ID>32777</EVENT-ID>
+                    <TRANSPORT-PROTOCOL>TCP</TRANSPORT-PROTOCOL>
+                </SOMEIP-EVENT-DEPLOYMENT>
+                <SOMEIP-EVENT-DEPLOYMENT UUID="b57ec775-018d-405b-9058-67103ca30200">
+                    <SHORT-NAME>notifyNetwork_Valid</SHORT-NAME>
+                    <EVENT-REF DEST="VARIABLE-DATA-PROTOTYPE">/interfaces/IVI_IPDU_Data/notifyNetwork_Valid</EVENT-REF>
+                    <EVENT-ID>32778</EVENT-ID>
+                    <TRANSPORT-PROTOCOL>TCP</TRANSPORT-PROTOCOL>
+                </SOMEIP-EVENT-DEPLOYMENT>
+                <SOMEIP-EVENT-DEPLOYMENT UUID="7f1f9fd6-3bcf-489a-ba9b-047a88d9634c">
+                    <SHORT-NAME>notifyroadIndex</SHORT-NAME>
+                    <EVENT-REF DEST="VARIABLE-DATA-PROTOTYPE">/interfaces/IVI_IPDU_Data/notifyroadIndex</EVENT-REF>
+                    <EVENT-ID>32779</EVENT-ID>
+                    <TRANSPORT-PROTOCOL>TCP</TRANSPORT-PROTOCOL>
+                </SOMEIP-EVENT-DEPLOYMENT>
+                <SOMEIP-EVENT-DEPLOYMENT UUID="f5985478-c7a1-4a53-a6f3-a0a9a839de6a">
+                    <SHORT-NAME>notifynaviData</SHORT-NAME>
+                    <EVENT-REF DEST="VARIABLE-DATA-PROTOTYPE">/interfaces/IVI_IPDU_Data/notifynaviData</EVENT-REF>
+                    <EVENT-ID>32780</EVENT-ID>
+                    <TRANSPORT-PROTOCOL>TCP</TRANSPORT-PROTOCOL>
+                </SOMEIP-EVENT-DEPLOYMENT>
+                <SOMEIP-EVENT-DEPLOYMENT UUID="4c82bf54-e751-45c4-9a0f-33b81f7208ff">
+                    <SHORT-NAME>notifystartchargetime</SHORT-NAME>
+                    <EVENT-REF DEST="VARIABLE-DATA-PROTOTYPE">/interfaces/IVI_IPDU_Data/notifystartchargetime</EVENT-REF>
+                    <EVENT-ID>32781</EVENT-ID>
+                    <TRANSPORT-PROTOCOL>TCP</TRANSPORT-PROTOCOL>
+                </SOMEIP-EVENT-DEPLOYMENT>
+            </EVENT-DEPLOYMENTS>
+            <SERVICE-INTERFACE-REF DEST="SERVICE-INTERFACE">/interfaces/IVI_IPDU_Data</SERVICE-INTERFACE-REF>
+            <EVENT-GROUPS>
+                <SOMEIP-EVENT-GROUP UUID="04229d28-a5d9-4f9d-ab41-d049415d53c7">
+                    <SHORT-NAME>IVI_IPDU_Data_1_EventGroup</SHORT-NAME>
+                    <EVENT-GROUP-ID>1</EVENT-GROUP-ID>
+                    <EVENT-REFS>
+                        <EVENT-REF DEST="SOMEIP-EVENT-DEPLOYMENT">/IAUTOSAR/IVI_IPDU_Data_Someip_Deployment/notifyIVIData</EVENT-REF>
+                        <EVENT-REF DEST="SOMEIP-EVENT-DEPLOYMENT">/IAUTOSAR/IVI_IPDU_Data_Someip_Deployment/notifyIC_Mileage</EVENT-REF>
+                        <EVENT-REF DEST="SOMEIP-EVENT-DEPLOYMENT">/IAUTOSAR/IVI_IPDU_Data_Someip_Deployment/notifyIC_MileageValid</EVENT-REF>
+                        <EVENT-REF DEST="SOMEIP-EVENT-DEPLOYMENT">/IAUTOSAR/IVI_IPDU_Data_Someip_Deployment/notifyEMS_fuelComsump100ms</EVENT-REF>
+                        <EVENT-REF DEST="SOMEIP-EVENT-DEPLOYMENT">/IAUTOSAR/IVI_IPDU_Data_Someip_Deployment/notifyEMS_engine_status</EVENT-REF>
+                        <EVENT-REF DEST="SOMEIP-EVENT-DEPLOYMENT">/IAUTOSAR/IVI_IPDU_Data_Someip_Deployment/notifyEMS_engCoolantTemp</EVENT-REF>
+                        <EVENT-REF DEST="SOMEIP-EVENT-DEPLOYMENT">/IAUTOSAR/IVI_IPDU_Data_Someip_Deployment/notifyEMS_engSpeed</EVENT-REF>
+                        <EVENT-REF DEST="SOMEIP-EVENT-DEPLOYMENT">/IAUTOSAR/IVI_IPDU_Data_Someip_Deployment/notifyBCM_PowerState</EVENT-REF>
+                        <EVENT-REF DEST="SOMEIP-EVENT-DEPLOYMENT">/IAUTOSAR/IVI_IPDU_Data_Someip_Deployment/notifyNaviEna</EVENT-REF>
+                        <EVENT-REF DEST="SOMEIP-EVENT-DEPLOYMENT">/IAUTOSAR/IVI_IPDU_Data_Someip_Deployment/notifyNetwork_Valid</EVENT-REF>
+                        <EVENT-REF DEST="SOMEIP-EVENT-DEPLOYMENT">/IAUTOSAR/IVI_IPDU_Data_Someip_Deployment/notifyroadIndex</EVENT-REF>
+                        <EVENT-REF DEST="SOMEIP-EVENT-DEPLOYMENT">/IAUTOSAR/IVI_IPDU_Data_Someip_Deployment/notifynaviData</EVENT-REF>
+                        <EVENT-REF DEST="SOMEIP-EVENT-DEPLOYMENT">/IAUTOSAR/IVI_IPDU_Data_Someip_Deployment/notifystartchargetime</EVENT-REF>
+                    </EVENT-REFS>
+                </SOMEIP-EVENT-GROUP>
+            </EVENT-GROUPS>
+            <SERVICE-INTERFACE-ID>44546</SERVICE-INTERFACE-ID>
+            <SERVICE-INTERFACE-VERSION>
+                <MAJOR-VERSION>1</MAJOR-VERSION>
+                <MINOR-VERSION>1</MINOR-VERSION>
+            </SERVICE-INTERFACE-VERSION>
+        </SOMEIP-SERVICE-INTERFACE-DEPLOYMENT>
+        <SOMEIP-SERVICE-INTERFACE-DEPLOYMENT UUID="d0c2962c-b35c-48af-b42d-a42dd8b300ab">
+            <SHORT-NAME>BCM_CHB_CS_Someip_Deployment</SHORT-NAME>
+            <FIELD-DEPLOYMENTS>
+                <SOMEIP-FIELD-DEPLOYMENT UUID="9d7cade4-5144-4f7d-9e71-e6b313c81c3f">
+                    <SHORT-NAME>chbWorkStatus</SHORT-NAME>
+                    <FIELD-REF DEST="FIELD">/interfaces/BCM_CHB_CS/chbWorkStatus</FIELD-REF>
+                    <GET UUID="2db0bfc9-f2d0-4df2-ab05-6f60fa0a3d09">
+                        <SHORT-NAME>chbWorkStatus_Getter</SHORT-NAME>
+                        <METHOD-ID>4097</METHOD-ID>
+                        <TRANSPORT-PROTOCOL>TCP</TRANSPORT-PROTOCOL>
+                    </GET>
+                    <NOTIFIER UUID="6c8484bd-053b-4e3b-96ad-daa68c77854d">
+                        <SHORT-NAME>chbWorkStatus_Notify</SHORT-NAME>
+                        <EVENT-ID>36865</EVENT-ID>
+                        <SERIALIZER>SOMEIP</SERIALIZER>
+                        <TRANSPORT-PROTOCOL>TCP</TRANSPORT-PROTOCOL>
+                    </NOTIFIER>
+                </SOMEIP-FIELD-DEPLOYMENT>
+                <SOMEIP-FIELD-DEPLOYMENT UUID="4a4efcee-8a64-430c-a780-49f73067f1fc">
+                    <SHORT-NAME>chbWorkPlanInfo</SHORT-NAME>
+                    <FIELD-REF DEST="FIELD">/interfaces/BCM_CHB_CS/chbWorkPlanInfo</FIELD-REF>
+                    <GET UUID="ab706190-01c7-4e92-8a40-6ec9c8d8fd85">
+                        <SHORT-NAME>chbWorkPlanInfo_Getter</SHORT-NAME>
+                        <METHOD-ID>4098</METHOD-ID>
+                        <TRANSPORT-PROTOCOL>TCP</TRANSPORT-PROTOCOL>
+                    </GET>
+                    <NOTIFIER UUID="a2deee26-178c-4f75-be69-af3a29ca5a98">
+                        <SHORT-NAME>chbWorkPlanInfo_Notify</SHORT-NAME>
+                        <EVENT-ID>36866</EVENT-ID>
+                        <SERIALIZER>SOMEIP</SERIALIZER>
+                        <TRANSPORT-PROTOCOL>TCP</TRANSPORT-PROTOCOL>
+                    </NOTIFIER>
+                </SOMEIP-FIELD-DEPLOYMENT>
+            </FIELD-DEPLOYMENTS>
+            <METHOD-DEPLOYMENTS>
+                <SOMEIP-METHOD-DEPLOYMENT UUID="bb4256d0-ed46-444d-a384-a5d532b72a8a">
+                    <SHORT-NAME>setWorkPara</SHORT-NAME>
+                    <METHOD-REF DEST="CLIENT-SERVER-OPERATION">/interfaces/BCM_CHB_CS/setWorkPara</METHOD-REF>
+                    <METHOD-ID>1</METHOD-ID>
+                    <TRANSPORT-PROTOCOL>TCP</TRANSPORT-PROTOCOL>
+                </SOMEIP-METHOD-DEPLOYMENT>
+                <SOMEIP-METHOD-DEPLOYMENT UUID="5f06f60f-e15d-446d-a5d2-b3e695fa391c">
+                    <SHORT-NAME>setCHBWorkPlan</SHORT-NAME>
+                    <METHOD-REF DEST="CLIENT-SERVER-OPERATION">/interfaces/BCM_CHB_CS/setCHBWorkPlan</METHOD-REF>
+                    <METHOD-ID>2</METHOD-ID>
+                    <TRANSPORT-PROTOCOL>TCP</TRANSPORT-PROTOCOL>
+                </SOMEIP-METHOD-DEPLOYMENT>
+                <SOMEIP-METHOD-DEPLOYMENT UUID="97a57e9d-a708-4013-82a3-e0243d02cce3">
+                    <SHORT-NAME>openCHBDoor</SHORT-NAME>
+                    <METHOD-REF DEST="CLIENT-SERVER-OPERATION">/interfaces/BCM_CHB_CS/openCHBDoor</METHOD-REF>
+                    <METHOD-ID>3</METHOD-ID>
+                    <TRANSPORT-PROTOCOL>TCP</TRANSPORT-PROTOCOL>
+                </SOMEIP-METHOD-DEPLOYMENT>
+            </METHOD-DEPLOYMENTS>
+            <SERVICE-INTERFACE-REF DEST="SERVICE-INTERFACE">/interfaces/BCM_CHB_CS</SERVICE-INTERFACE-REF>
+            <EVENT-GROUPS>
+                <SOMEIP-EVENT-GROUP UUID="37f9cc02-3bc3-493e-b7c9-5b56b7fef9a1">
+                    <SHORT-NAME>BCM_CHB_CS_1_EventGroup</SHORT-NAME>
+                    <EVENT-GROUP-ID>1</EVENT-GROUP-ID>
+                    <EVENT-REFS>
+                        <EVENT-REF DEST="SOMEIP-EVENT-DEPLOYMENT">/IAUTOSAR/BCM_CHB_CS_Someip_Deployment/chbWorkStatus/chbWorkStatus_Notify</EVENT-REF>
+                        <EVENT-REF DEST="SOMEIP-EVENT-DEPLOYMENT">/IAUTOSAR/BCM_CHB_CS_Someip_Deployment/chbWorkPlanInfo/chbWorkPlanInfo_Notify</EVENT-REF>
+                    </EVENT-REFS>
+                </SOMEIP-EVENT-GROUP>
+            </EVENT-GROUPS>
+            <SERVICE-INTERFACE-ID>22021</SERVICE-INTERFACE-ID>
+            <SERVICE-INTERFACE-VERSION>
+                <MAJOR-VERSION>1</MAJOR-VERSION>
+                <MINOR-VERSION>1</MINOR-VERSION>
+            </SERVICE-INTERFACE-VERSION>
+        </SOMEIP-SERVICE-INTERFACE-DEPLOYMENT>
+        <SOMEIP-SERVICE-INTERFACE-DEPLOYMENT UUID="9db3ff12-8ddd-4e9e-92cf-4313102dae27">
+            <SHORT-NAME>BCM_DLP_AppSrv_Someip_Deployment</SHORT-NAME>
+            <FIELD-DEPLOYMENTS>
+                <SOMEIP-FIELD-DEPLOYMENT UUID="bcc8b307-acd6-4f90-b17b-f31161bdd2eb">
+                    <SHORT-NAME>cfgPara</SHORT-NAME>
+                    <FIELD-REF DEST="FIELD">/interfaces/BCM_DLP_AppSrv/cfgPara</FIELD-REF>
+                    <GET UUID="0d27f835-032d-4fb9-a4d3-825a811fe612">
+                        <SHORT-NAME>cfgPara_Getter</SHORT-NAME>
+                        <METHOD-ID>4097</METHOD-ID>
+                        <TRANSPORT-PROTOCOL>TCP</TRANSPORT-PROTOCOL>
+                    </GET>
+                    <NOTIFIER UUID="df529822-f75a-4b9d-b484-297cc31eafaf">
+                        <SHORT-NAME>cfgPara_Notify</SHORT-NAME>
+                        <EVENT-ID>36865</EVENT-ID>
+                        <SERIALIZER>SOMEIP</SERIALIZER>
+                        <TRANSPORT-PROTOCOL>TCP</TRANSPORT-PROTOCOL>
+                    </NOTIFIER>
+                </SOMEIP-FIELD-DEPLOYMENT>
+                <SOMEIP-FIELD-DEPLOYMENT UUID="36c63d4a-10b0-4fff-ae76-405fd7fe55a2">
+                    <SHORT-NAME>widthGuidanceAvailableSts</SHORT-NAME>
+                    <FIELD-REF DEST="FIELD">/interfaces/BCM_DLP_AppSrv/widthGuidanceAvailableSts</FIELD-REF>
+                    <GET UUID="0d869610-24ec-4bf0-88f2-d6c1c8bf321c">
+                        <SHORT-NAME>widthGuidanceAvailableSts_Getter</SHORT-NAME>
+                        <METHOD-ID>4098</METHOD-ID>
+                        <TRANSPORT-PROTOCOL>TCP</TRANSPORT-PROTOCOL>
+                    </GET>
+                    <NOTIFIER UUID="569df692-ecae-465a-bf07-79dcd61d10a3">
+                        <SHORT-NAME>widthGuidanceAvailableSts_Notify</SHORT-NAME>
+                        <EVENT-ID>36866</EVENT-ID>
+                        <SERIALIZER>SOMEIP</SERIALIZER>
+                        <TRANSPORT-PROTOCOL>TCP</TRANSPORT-PROTOCOL>
+                    </NOTIFIER>
+                </SOMEIP-FIELD-DEPLOYMENT>
+                <SOMEIP-FIELD-DEPLOYMENT UUID="0b5a132d-be98-4598-98d1-ee87c1f5c361">
+                    <SHORT-NAME>dLPVideoProjectionAvailableSts</SHORT-NAME>
+                    <FIELD-REF DEST="FIELD">/interfaces/BCM_DLP_AppSrv/dLPVideoProjectionAvailableSts</FIELD-REF>
+                    <GET UUID="3bccde33-9f22-4ff1-8739-c05fdcf9064c">
+                        <SHORT-NAME>dLPVideoProjectionAvailableSts_Getter</SHORT-NAME>
+                        <METHOD-ID>4101</METHOD-ID>
+                        <TRANSPORT-PROTOCOL>TCP</TRANSPORT-PROTOCOL>
+                    </GET>
+                    <NOTIFIER UUID="4321791c-bdac-4b07-944d-244a23f14bbf">
+                        <SHORT-NAME>dLPVideoProjectionAvailableSts_Notify</SHORT-NAME>
+                        <EVENT-ID>36869</EVENT-ID>
+                        <SERIALIZER>SOMEIP</SERIALIZER>
+                        <TRANSPORT-PROTOCOL>TCP</TRANSPORT-PROTOCOL>
+                    </NOTIFIER>
+                </SOMEIP-FIELD-DEPLOYMENT>
+                <SOMEIP-FIELD-DEPLOYMENT UUID="229f0774-7258-47a5-a47e-b3eb5d739a20">
+                    <SHORT-NAME>dLPMediaAutoCalSts</SHORT-NAME>
+                    <FIELD-REF DEST="FIELD">/interfaces/BCM_DLP_AppSrv/dLPMediaAutoCalSts</FIELD-REF>
+                    <GET UUID="9466d4ea-5c9c-4c64-8d72-3d1937fabc1f">
+                        <SHORT-NAME>dLPMediaAutoCalSts_Getter</SHORT-NAME>
+                        <METHOD-ID>4103</METHOD-ID>
+                        <TRANSPORT-PROTOCOL>TCP</TRANSPORT-PROTOCOL>
+                    </GET>
+                    <NOTIFIER UUID="12364465-6f08-4593-9cd1-df9a25eaab51">
+                        <SHORT-NAME>dLPMediaAutoCalSts_Notify</SHORT-NAME>
+                        <EVENT-ID>36871</EVENT-ID>
+                        <SERIALIZER>SOMEIP</SERIALIZER>
+                        <TRANSPORT-PROTOCOL>TCP</TRANSPORT-PROTOCOL>
+                    </NOTIFIER>
+                </SOMEIP-FIELD-DEPLOYMENT>
+                <SOMEIP-FIELD-DEPLOYMENT UUID="45540313-90c7-4818-b060-2e3b5515f395">
+                    <SHORT-NAME>dLPFaultSts</SHORT-NAME>
+                    <FIELD-REF DEST="FIELD">/interfaces/BCM_DLP_AppSrv/dLPFaultSts</FIELD-REF>
+                    <GET UUID="55228775-7fa8-456b-9c44-d272bdf606c9">
+                        <SHORT-NAME>dLPFaultSts_Getter</SHORT-NAME>
+                        <METHOD-ID>4107</METHOD-ID>
+                        <TRANSPORT-PROTOCOL>TCP</TRANSPORT-PROTOCOL>
+                    </GET>
+                    <NOTIFIER UUID="37d7c43e-3ce4-47c9-9e4b-26a8484d3645">
+                        <SHORT-NAME>dLPFaultSts_Notify</SHORT-NAME>
+                        <EVENT-ID>36875</EVENT-ID>
+                        <SERIALIZER>SOMEIP</SERIALIZER>
+                        <TRANSPORT-PROTOCOL>TCP</TRANSPORT-PROTOCOL>
+                    </NOTIFIER>
+                </SOMEIP-FIELD-DEPLOYMENT>
+                <SOMEIP-FIELD-DEPLOYMENT UUID="10ddd4ba-bf26-47d8-9c7b-7813ac640af5">
+                    <SHORT-NAME>dLPVideoStreamTransSts</SHORT-NAME>
+                    <FIELD-REF DEST="FIELD">/interfaces/BCM_DLP_AppSrv/dLPVideoStreamTransSts</FIELD-REF>
+                    <GET UUID="b3407538-806d-43dd-9b07-4ca8d7d78347">
+                        <SHORT-NAME>dLPVideoStreamTransSts_Getter</SHORT-NAME>
+                        <METHOD-ID>4108</METHOD-ID>
+                        <TRANSPORT-PROTOCOL>TCP</TRANSPORT-PROTOCOL>
+                    </GET>
+                    <NOTIFIER UUID="d308eee6-0847-4743-b5a0-15e86c3329f8">
+                        <SHORT-NAME>dLPVideoStreamTransSts_Notify</SHORT-NAME>
+                        <EVENT-ID>36876</EVENT-ID>
+                        <SERIALIZER>SOMEIP</SERIALIZER>
+                        <TRANSPORT-PROTOCOL>TCP</TRANSPORT-PROTOCOL>
+                    </NOTIFIER>
+                </SOMEIP-FIELD-DEPLOYMENT>
+                <SOMEIP-FIELD-DEPLOYMENT UUID="be289b94-abf1-4f69-925f-963de0185fed">
+                    <SHORT-NAME>dLPADSProjectionAvailableSts</SHORT-NAME>
+                    <FIELD-REF DEST="FIELD">/interfaces/BCM_DLP_AppSrv/dLPADSProjectionAvailableSts</FIELD-REF>
+                    <GET UUID="365f0912-f19d-40a8-ae01-29fd12d29d80">
+                        <SHORT-NAME>dLPADSProjectionAvailableSts_Getter</SHORT-NAME>
+                        <METHOD-ID>4109</METHOD-ID>
+                        <TRANSPORT-PROTOCOL>TCP</TRANSPORT-PROTOCOL>
+                    </GET>
+                    <NOTIFIER UUID="c92e526b-2cbe-45f5-9136-4493f2e06dfc">
+                        <SHORT-NAME>dLPADSProjectionAvailableSts_Notify</SHORT-NAME>
+                        <EVENT-ID>36877</EVENT-ID>
+                        <SERIALIZER>SOMEIP</SERIALIZER>
+                        <TRANSPORT-PROTOCOL>TCP</TRANSPORT-PROTOCOL>
+                    </NOTIFIER>
+                </SOMEIP-FIELD-DEPLOYMENT>
+                <SOMEIP-FIELD-DEPLOYMENT UUID="3379c44d-897d-4afd-ace3-ead8e27e1bfe">
+                    <SHORT-NAME>dLPMediaAvailableSts</SHORT-NAME>
+                    <FIELD-REF DEST="FIELD">/interfaces/BCM_DLP_AppSrv/dLPMediaAvailableSts</FIELD-REF>
+                    <GET UUID="ba6ae7b0-15f6-4563-a176-c7d345980879">
+                        <SHORT-NAME>dLPMediaAvailableSts_Getter</SHORT-NAME>
+                        <METHOD-ID>4110</METHOD-ID>
+                        <TRANSPORT-PROTOCOL>TCP</TRANSPORT-PROTOCOL>
+                    </GET>
+                    <NOTIFIER UUID="a23ca19d-3e7a-43a3-b320-5f988f21851e">
+                        <SHORT-NAME>dLPMediaAvailableSts_Notify</SHORT-NAME>
+                        <EVENT-ID>36878</EVENT-ID>
+                        <SERIALIZER>SOMEIP</SERIALIZER>
+                        <TRANSPORT-PROTOCOL>TCP</TRANSPORT-PROTOCOL>
+                    </NOTIFIER>
+                </SOMEIP-FIELD-DEPLOYMENT>
+            </FIELD-DEPLOYMENTS>
+            <METHOD-DEPLOYMENTS>
+                <SOMEIP-METHOD-DEPLOYMENT UUID="02a8a5a4-2976-45d8-ae15-ad8d43656410">
+                    <SHORT-NAME>setCfgPara</SHORT-NAME>
+                    <METHOD-REF DEST="CLIENT-SERVER-OPERATION">/interfaces/BCM_DLP_AppSrv/setCfgPara</METHOD-REF>
+                    <METHOD-ID>1</METHOD-ID>
+                    <TRANSPORT-PROTOCOL>TCP</TRANSPORT-PROTOCOL>
+                </SOMEIP-METHOD-DEPLOYMENT>
+                <SOMEIP-METHOD-DEPLOYMENT UUID="67d58174-d60c-4b11-809a-bbb42c393269">
+                    <SHORT-NAME>setAllDLPFunctionDisable</SHORT-NAME>
+                    <METHOD-REF DEST="CLIENT-SERVER-OPERATION">/interfaces/BCM_DLP_AppSrv/setAllDLPFunctionDisable</METHOD-REF>
+                    <METHOD-ID>2</METHOD-ID>
+                    <TRANSPORT-PROTOCOL>TCP</TRANSPORT-PROTOCOL>
+                </SOMEIP-METHOD-DEPLOYMENT>
+                <SOMEIP-METHOD-DEPLOYMENT UUID="d2601e1a-7851-4ab1-bc5b-71e6c0d395fa">
+                    <SHORT-NAME>setDLPMediaAutoCalibration</SHORT-NAME>
+                    <METHOD-REF DEST="CLIENT-SERVER-OPERATION">/interfaces/BCM_DLP_AppSrv/setDLPMediaAutoCalibration</METHOD-REF>
+                    <METHOD-ID>6</METHOD-ID>
+                    <TRANSPORT-PROTOCOL>TCP</TRANSPORT-PROTOCOL>
+                </SOMEIP-METHOD-DEPLOYMENT>
+                <SOMEIP-METHOD-DEPLOYMENT UUID="0c7be4d8-0278-4210-98ed-33442456175a">
+                    <SHORT-NAME>sendDLPVideoStreamTransReq</SHORT-NAME>
+                    <METHOD-REF DEST="CLIENT-SERVER-OPERATION">/interfaces/BCM_DLP_AppSrv/sendDLPVideoStreamTransReq</METHOD-REF>
+                    <METHOD-ID>12</METHOD-ID>
+                    <TRANSPORT-PROTOCOL>TCP</TRANSPORT-PROTOCOL>
+                </SOMEIP-METHOD-DEPLOYMENT>
+            </METHOD-DEPLOYMENTS>
+            <SERVICE-INTERFACE-REF DEST="SERVICE-INTERFACE">/interfaces/BCM_DLP_AppSrv</SERVICE-INTERFACE-REF>
+            <EVENT-GROUPS>
+                <SOMEIP-EVENT-GROUP UUID="fa3c70e5-b301-4a05-b340-d5270d71e5f7">
+                    <SHORT-NAME>BCM_DLP_AppSrv_1_EventGroup</SHORT-NAME>
+                    <EVENT-GROUP-ID>1</EVENT-GROUP-ID>
+                    <EVENT-REFS>
+                        <EVENT-REF DEST="SOMEIP-EVENT-DEPLOYMENT">/IAUTOSAR/BCM_DLP_AppSrv_Someip_Deployment/cfgPara/cfgPara_Notify</EVENT-REF>
+                        <EVENT-REF DEST="SOMEIP-EVENT-DEPLOYMENT">/IAUTOSAR/BCM_DLP_AppSrv_Someip_Deployment/widthGuidanceAvailableSts/widthGuidanceAvailableSts_Notify</EVENT-REF>
+                        <EVENT-REF DEST="SOMEIP-EVENT-DEPLOYMENT">/IAUTOSAR/BCM_DLP_AppSrv_Someip_Deployment/dLPVideoProjectionAvailableSts/dLPVideoProjectionAvailableSts_Notify</EVENT-REF>
+                        <EVENT-REF DEST="SOMEIP-EVENT-DEPLOYMENT">/IAUTOSAR/BCM_DLP_AppSrv_Someip_Deployment/dLPMediaAutoCalSts/dLPMediaAutoCalSts_Notify</EVENT-REF>
+                        <EVENT-REF DEST="SOMEIP-EVENT-DEPLOYMENT">/IAUTOSAR/BCM_DLP_AppSrv_Someip_Deployment/dLPFaultSts/dLPFaultSts_Notify</EVENT-REF>
+                        <EVENT-REF DEST="SOMEIP-EVENT-DEPLOYMENT">/IAUTOSAR/BCM_DLP_AppSrv_Someip_Deployment/dLPVideoStreamTransSts/dLPVideoStreamTransSts_Notify</EVENT-REF>
+                        <EVENT-REF DEST="SOMEIP-EVENT-DEPLOYMENT">/IAUTOSAR/BCM_DLP_AppSrv_Someip_Deployment/dLPADSProjectionAvailableSts/dLPADSProjectionAvailableSts_Notify</EVENT-REF>
+                        <EVENT-REF DEST="SOMEIP-EVENT-DEPLOYMENT">/IAUTOSAR/BCM_DLP_AppSrv_Someip_Deployment/dLPMediaAvailableSts/dLPMediaAvailableSts_Notify</EVENT-REF>
+                    </EVENT-REFS>
+                </SOMEIP-EVENT-GROUP>
+            </EVENT-GROUPS>
+            <SERVICE-INTERFACE-ID>22283</SERVICE-INTERFACE-ID>
+            <SERVICE-INTERFACE-VERSION>
+                <MAJOR-VERSION>1</MAJOR-VERSION>
+                <MINOR-VERSION>1</MINOR-VERSION>
+            </SERVICE-INTERFACE-VERSION>
+        </SOMEIP-SERVICE-INTERFACE-DEPLOYMENT>
+
+    </ELEMENTS>
+</AR-PACKAGE>
