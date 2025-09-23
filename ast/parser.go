@@ -31,6 +31,9 @@ func (p *Parser) Parse() error {
 	if autoSar == nil {
 		return fmt.Errorf("no autosar")
 	}
+	if err := p.search(autoSar); err != nil {
+		return err
+	}
 	if err := p.parseDataTypes(); err != nil {
 		return err
 	}

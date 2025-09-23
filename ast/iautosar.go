@@ -66,7 +66,7 @@ func (p *Parser) ParseServiceInterface(si *etree.Element) (*Service, error) {
 			s.Events[eid] = event
 		}
 	}
-	fds := si.SelectElement("FORM-DEPLOYMENTS")
+	fds := si.SelectElement("FIELD-DEPLOYMENTS")
 	if fds != nil {
 		eventdeployments := fds.SelectElements("SOMEIP-FIELD-DEPLOYMENT")
 		for _, ed := range eventdeployments {
