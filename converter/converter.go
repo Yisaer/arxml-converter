@@ -80,7 +80,8 @@ func NewConverter(path string, config converter.IDlConverterConfig) (*ArXMLConve
 	if err := c.Parser.Parse(); err != nil {
 		return nil, err
 	}
-	for _, dt := range c.Parser.DtList {
+
+	for _, dt := range c.Parser.DataTypes {
 		key := fmt.Sprintf("/dataTypes/%s", dt.ShorName)
 		switch {
 		case dt.TypReference != nil:
@@ -114,4 +115,8 @@ func (c *ArXMLConverter) Decode(stName string, data []byte) (interface{}, error)
 func (c *ArXMLConverter) ToIDLModule() (*idlAst.Module, error) {
 	converter := NewArXMLToIDLConverter(c.Parser)
 	return converter.ConvertToIDLModule()
+}
+
+func (c *ArXMLConverter) GetTypeByID(serviceID, eventID int) {
+
 }

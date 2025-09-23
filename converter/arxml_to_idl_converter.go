@@ -28,9 +28,7 @@ func (c *ArXMLToIDLConverter) ConvertToIDLModule() (*idlAst.Module, error) {
 	// 创建模块内容列表
 	var content []idlAst.ModuleContent
 
-	// 遍历所有数据类型
-	for _, dt := range c.parser.DtList {
-		// 只转换结构体类型
+	for _, dt := range c.parser.DataTypes {
 		if dt.Category == "STRUCTURE" && dt.Structure != nil {
 			structContent, err := c.convertStructure(dt)
 			if err != nil {
@@ -56,7 +54,6 @@ func (c *ArXMLToIDLConverter) convertStructure(dt *ast.DataType) (*struct_type.S
 		return nil, fmt.Errorf("structure is nil for %s", dt.ShorName)
 	}
 	var fields []struct_type.Field
-	// 转换结构体字段
 	for _, strField := range dt.Structure.STRList {
 		field, err := c.convertField(strField)
 		if err != nil {
@@ -153,7 +150,7 @@ func (c *ArXMLToIDLConverter) getBasicType(typeName string) typeref.TypeRef {
 func (c *ArXMLToIDLConverter) getArrayType(ref string) typeref.TypeRef {
 	// 在 ArXML 中，数组类型通过 Array 结构体表示
 	// 这里我们需要检查是否有对应的 Array 定义
-	for _, dt := range c.parser.DtList {
+	for _, dt := range c.parser.DataTypes {
 		if dt.Category == "ARRAY" && dt.Array != nil {
 			// 检查引用是否匹配
 			arrayRef := fmt.Sprintf("/dataTypes/%s", dt.ShorName)
@@ -169,6 +166,7 @@ func (c *ArXMLToIDLConverter) getArrayType(ref string) typeref.TypeRef {
 			}
 		}
 	}
+
 	return nil
 }
 
@@ -177,7 +175,7 @@ func (c *ArXMLToIDLConverter) getStringType(ref string) typeref.TypeRef {
 	lowerRef := strings.ToLower(ref)
 	if strings.Contains(lowerRef, "string") {
 		// 检查是否有固定长度
-		for _, dt := range c.parser.DtList {
+		for _, dt := range c.parser.DataTypes {
 			if dt.TypReference != nil && dt.TypReference.Ref == ref && dt.TypReference.StringSize > 0 {
 				return typeref.NewFixedLengthStringType(int(dt.TypReference.StringSize))
 			}

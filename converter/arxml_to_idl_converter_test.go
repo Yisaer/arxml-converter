@@ -3,8 +3,10 @@ package converter
 import (
 	"testing"
 
-	"arxml-converter/ast"
 	"github.com/stretchr/testify/require"
+	"github.com/yisaer/idl-parser/converter"
+
+	"arxml-converter/ast"
 )
 
 func TestArXMLToIDLConverter(t *testing.T) {
@@ -35,7 +37,7 @@ func TestArXMLToIDLConverter(t *testing.T) {
 
 func TestArXMLConverter_ToIDLModule(t *testing.T) {
 	// 创建 ArXMLConverter
-	converter, err := NewConverter("../ast/example.xml", false)
+	converter, err := NewConverter("../ast/example.xml", converter.IDlConverterConfig{IsLittleEndian: false, LengthFieldLength: 4})
 	require.NoError(t, err)
 	require.NotNil(t, converter)
 
