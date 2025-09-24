@@ -36,7 +36,7 @@ func (p *Parser) parseDataTypes() error {
 		if err != nil {
 			return fmt.Errorf("index %d STD-CPP-IMPLEMENTATION-DATA-TYPE has err:%v", index, err.Error())
 		}
-		p.DataTypes[dt.ShorName] = dt
+		p.DataTypes[strings.ToLower(dt.ShorName)] = dt
 	}
 	return nil
 }
