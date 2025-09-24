@@ -116,7 +116,7 @@ func (p *Parser) parseDataType(d *etree.Element) (*DataType, error) {
 }
 
 type DataType struct {
-	ShorName string `json:"shor_name"`
+	ShorName string `json:"short_name"`
 	Category string `json:"category"`
 	*TypReference
 	*Array

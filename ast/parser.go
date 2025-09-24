@@ -7,12 +7,15 @@ import (
 )
 
 type Parser struct {
-	Path             string
-	Doc              *etree.Document
-	iautoSarElement  *etree.Element
-	dataTypesElement *etree.Element
-	DataTypes        map[string]*DataType
-	Services         map[int]*Service
+	Path              string
+	Doc               *etree.Document
+	iautoSarElement   *etree.Element
+	dataTypesElement  *etree.Element
+	interfacesElement *etree.Element
+
+	Interfaces map[string]*ServiceInterface
+	DataTypes  map[string]*DataType
+	Services   map[int]*Service
 }
 
 func NewParser(path string) (*Parser, error) {
@@ -21,6 +24,7 @@ func NewParser(path string) (*Parser, error) {
 		return nil, err
 	}
 	p := &Parser{Path: path, Doc: doc}
+	p.Interfaces = make(map[string]*ServiceInterface)
 	p.DataTypes = make(map[string]*DataType)
 	p.Services = make(map[int]*Service)
 	return p, nil
@@ -32,6 +36,9 @@ func (p *Parser) Parse() error {
 		return fmt.Errorf("no autosar")
 	}
 	if err := p.search(autoSar); err != nil {
+		return err
+	}
+	if err := p.parseInterfaces(); err != nil {
 		return err
 	}
 	if err := p.parseDataTypes(); err != nil {
@@ -58,6 +65,9 @@ func (p *Parser) search(autoSar *etree.Element) error {
 	if err := p.searchIAutoSar(arPackageList); err != nil {
 		return err
 	}
+	if err := p.searchInterfaces(arPackageList); err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -73,4 +83,18 @@ func (p *Parser) searchIAutoSar(arPackageElements []*etree.Element) error {
 		}
 	}
 	return fmt.Errorf("no IAUTOSAR find in ar package")
+}
+
+func (p *Parser) searchInterfaces(arPackageElements []*etree.Element) error {
+	for _, arPackage := range arPackageElements {
+		s := arPackage.SelectElement("SHORT-NAME")
+		if s == nil {
+			continue
+		}
+		if s.Text() == "interfaces" {
+			p.interfacesElement = arPackage
+			return nil
+		}
+	}
+	return fmt.Errorf("no interfaces find in ar package")
 }
