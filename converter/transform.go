@@ -8,7 +8,7 @@ import (
 	"github.com/yisaer/idl-parser/ast/struct_type"
 	"github.com/yisaer/idl-parser/ast/typeref"
 
-	"arxml-converter/ast"
+	"arxml-converter/mod"
 )
 
 func (c *ArXMLConverter) TransformToIDLModule() (*idlAst.Module, error) {
@@ -34,7 +34,7 @@ func (c *ArXMLConverter) TransformToIDLModule() (*idlAst.Module, error) {
 }
 
 // convertStructure 将 ArXML Structure 转换为 idlAst Struct
-func (c *ArXMLConverter) transformStructure(dt *ast.DataType) (*struct_type.Struct, error) {
+func (c *ArXMLConverter) transformStructure(dt *mod.DataType) (*struct_type.Struct, error) {
 	if dt.Structure == nil {
 		return nil, fmt.Errorf("structure is nil for %s", dt.ShorName)
 	}
@@ -55,7 +55,7 @@ func (c *ArXMLConverter) transformStructure(dt *ast.DataType) (*struct_type.Stru
 }
 
 // convertField 将 ArXML StructureTypRef 转换为 idlAst Field
-func (c *ArXMLConverter) transformField(strField *ast.StructureTypRef) (typeref.TypeRef, error) {
+func (c *ArXMLConverter) transformField(strField *mod.StructureTypRef) (typeref.TypeRef, error) {
 	typeRef, err := c.createTypeRef(strField.Ref)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create type ref for %s: %w", strField.Ref, err)
@@ -114,43 +114,6 @@ func (c *ArXMLConverter) getBasicType(typeName string) typeref.TypeRef {
 	return nil
 }
 
-// getArrayType 检查并创建数组类型
-func (c *ArXMLConverter) getArrayType(ref string) typeref.TypeRef {
-	// 在 ArXML 中，数组类型通过 Array 结构体表示
-	// 这里我们需要检查是否有对应的 Array 定义
-	for _, dt := range c.Parser.DataTypes {
-		if dt.Category == "ARRAY" && dt.Array != nil {
-			// 检查引用是否匹配
-			arrayRef := fmt.Sprintf("/dataTypes/%s", dt.ShorName)
-			if ref == arrayRef {
-				innerType, err := c.createTypeRef(dt.Array.RefType)
-				if err != nil {
-					continue
-				}
-				if dt.Array.ArraySize > 0 {
-					return typeref.NewArrayType(innerType, int(dt.Array.ArraySize))
-				}
-				return typeref.NewSequence(innerType)
-			}
-		}
-	}
-	return nil
-}
-
-// getStringType 检查并创建字符串类型
-func (c *ArXMLConverter) getStringType(ref string) typeref.TypeRef {
-	lowerRef := strings.ToLower(ref)
-	if strings.Contains(lowerRef, "string") {
-		for _, dt := range c.Parser.DataTypes {
-			if dt.TypReference != nil && dt.TypReference.Ref == ref && dt.TypReference.StringSize > 0 {
-				return typeref.NewFixedLengthStringType(int(dt.TypReference.StringSize))
-			}
-		}
-		return typeref.NewStringType()
-	}
-	return nil
-}
-
 // GetConvertedTypeRef 获取转换后的 TypeRef
 func (c *ArXMLConverter) GetConvertedTypeRef(key string) (typeref.TypeRef, bool) {
 	typeRef, exists := c.convertedTypeRefs[key]
@@ -163,7 +126,7 @@ func (c *ArXMLConverter) GetAllConvertedTypeRefs() map[string]typeref.TypeRef {
 }
 
 // convertDataTypeToTypeRef 将 ArXML DataType 转换为 typeref.TypeRef
-func (c *ArXMLConverter) convertDataTypeToTypeRef(dt *ast.DataType) (typeref.TypeRef, error) {
+func (c *ArXMLConverter) convertDataTypeToTypeRef(dt *mod.DataType) (typeref.TypeRef, error) {
 	switch dt.Category {
 	case "TYPE_REFERENCE":
 		return c.convertTypReference(dt.TypReference)
@@ -177,24 +140,18 @@ func (c *ArXMLConverter) convertDataTypeToTypeRef(dt *ast.DataType) (typeref.Typ
 }
 
 // convertTypReference 转换 TypReference 为 TypeRef
-func (c *ArXMLConverter) convertTypReference(tr *ast.TypReference) (typeref.TypeRef, error) {
+func (c *ArXMLConverter) convertTypReference(tr *mod.TypReference) (typeref.TypeRef, error) {
 	if tr == nil {
 		return nil, fmt.Errorf("typReference is nil")
 	}
-	if strings.Contains(strings.ToLower(tr.Ref), "string") {
-		if tr.StringSize > 0 {
-			return typeref.NewFixedLengthStringType(int(tr.StringSize)), nil
-		}
-		return typeref.NewStringType(), nil
-	}
-	if basicType := c.getBasicTypeFromRef(tr.Ref); basicType != nil {
+	if basicType := c.getBasicTypeFromRef(tr); basicType != nil {
 		return basicType, nil
 	}
 	return nil, fmt.Errorf("unknown type reference: %s", tr.Ref)
 }
 
 // convertArray 转换 Array 为 TypeRef
-func (c *ArXMLConverter) convertArray(arr *ast.Array) (typeref.TypeRef, error) {
+func (c *ArXMLConverter) convertArray(arr *mod.Array) (typeref.TypeRef, error) {
 	if arr == nil {
 		return nil, fmt.Errorf("array is nil")
 	}
@@ -209,7 +166,7 @@ func (c *ArXMLConverter) convertArray(arr *ast.Array) (typeref.TypeRef, error) {
 }
 
 // convertStructure 转换 Structure 为 TypeRef
-func (c *ArXMLConverter) convertStructure(structData *ast.Structure, structName string) (typeref.TypeRef, error) {
+func (c *ArXMLConverter) convertStructure(structData *mod.Structure, structName string) (typeref.TypeRef, error) {
 	if structData == nil {
 		return nil, fmt.Errorf("structure is nil")
 	}
@@ -226,11 +183,16 @@ func (c *ArXMLConverter) convertRefToTypeRef(ref string) (typeref.TypeRef, error
 }
 
 // getBasicTypeFromRef 从引用中获取基础类型
-func (c *ArXMLConverter) getBasicTypeFromRef(ref string) typeref.TypeRef {
+func (c *ArXMLConverter) getBasicTypeFromRef(tr *mod.TypReference) typeref.TypeRef {
+	ref := tr.Ref
 	typeName := extractTypeNameFromRef(ref)
 	lowerName := strings.ToLower(typeName)
-
 	switch {
+	case strings.Contains(lowerName, "string"):
+		if tr.StringSize > 0 {
+			return typeref.NewFixedLengthStringType(int(tr.StringSize))
+		}
+		return typeref.NewStringType()
 	case strings.Contains(lowerName, "uint8"):
 		return typeref.NewOctetType()
 	case strings.Contains(lowerName, "uint16"):

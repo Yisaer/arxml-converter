@@ -6,6 +6,8 @@ import (
 	"strings"
 
 	"github.com/beevik/etree"
+
+	"arxml-converter/mod"
 )
 
 func (p *Parser) searchDataTypes(arPackageElements []*etree.Element) error {
@@ -41,8 +43,8 @@ func (p *Parser) parseDataTypes() error {
 	return nil
 }
 
-func (p *Parser) parseDataType(d *etree.Element) (*DataType, error) {
-	dt := &DataType{}
+func (p *Parser) parseDataType(d *etree.Element) (*mod.DataType, error) {
+	dt := &mod.DataType{}
 	sn := d.SelectElement("SHORT-NAME")
 	if sn == nil {
 		return nil, fmt.Errorf("no SHORT-NAME in %v", d.Text())
@@ -59,7 +61,7 @@ func (p *Parser) parseDataType(d *etree.Element) (*DataType, error) {
 		if ref == nil {
 			return nil, fmt.Errorf("no TYPE-REFERENCE-REF")
 		}
-		dt.TypReference = &TypReference{Ref: ref.Text()}
+		dt.TypReference = &mod.TypReference{Ref: ref.Text()}
 		if strings.Contains(strings.ToLower(dt.TypReference.Ref), "string") {
 			stringSize := d.SelectElement("ARRAY-SIZE")
 			if stringSize == nil {
@@ -100,7 +102,7 @@ func (p *Parser) parseDataType(d *etree.Element) (*DataType, error) {
 		if typRef == nil {
 			return nil, fmt.Errorf("no TEMPLATE-TYPE-REF in CPP-TEMPLATE-ARGUMENT")
 		}
-		dt.Array = &Array{
+		dt.Array = &mod.Array{
 			ArraySize: as,
 			Inplace:   ip,
 			RefType:   typRef.Text(),
@@ -115,46 +117,17 @@ func (p *Parser) parseDataType(d *etree.Element) (*DataType, error) {
 	return dt, nil
 }
 
-type DataType struct {
-	ShorName string `json:"short_name"`
-	Category string `json:"category"`
-	*TypReference
-	*Array
-	*Structure
-}
-
-type TypReference struct {
-	Ref        string `json:"ref"`
-	StringSize int64  `json:"string_size"`
-}
-
-type Array struct {
-	ArraySize int64  `json:"array_size"`
-	Inplace   bool   `json:"inplace"`
-	RefType   string `json:"ref_type"`
-}
-
-type Structure struct {
-	STRList []*StructureTypRef `json:"str_list"`
-}
-
-type StructureTypRef struct {
-	InPlace  bool   `json:"in_place"`
-	Ref      string `json:"ref"`
-	ShorName string `json:"shor_name"`
-}
-
-func (p *Parser) ParseStructure(dt *DataType, d *etree.Element) error {
+func (p *Parser) ParseStructure(dt *mod.DataType, d *etree.Element) error {
 	subElements := d.SelectElement("SUB-ELEMENTS")
 	if subElements == nil {
 		return fmt.Errorf("no SUB-ELEMENTS")
 	}
 	cppElements := subElements.SelectElements("CPP-IMPLEMENTATION-DATA-TYPE-ELEMENT")
-	dt.Structure = &Structure{
-		STRList: make([]*StructureTypRef, 0),
+	dt.Structure = &mod.Structure{
+		STRList: make([]*mod.StructureTypRef, 0),
 	}
 	for _, cppElement := range cppElements {
-		str := &StructureTypRef{}
+		str := &mod.StructureTypRef{}
 		sn := cppElement.SelectElement("SHORT-NAME")
 		if sn == nil {
 			return fmt.Errorf("no SHORT-NAME")

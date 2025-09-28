@@ -4,6 +4,8 @@ import (
 	"fmt"
 
 	"github.com/beevik/etree"
+
+	"arxml-converter/mod"
 )
 
 type Parser struct {
@@ -14,7 +16,7 @@ type Parser struct {
 	interfacesElement *etree.Element
 
 	Interfaces map[string]*ServiceInterface
-	DataTypes  map[string]*DataType
+	DataTypes  map[string]*mod.DataType
 	Services   map[int]*Service
 }
 
@@ -25,7 +27,7 @@ func NewParser(path string) (*Parser, error) {
 	}
 	p := &Parser{Path: path, Doc: doc}
 	p.Interfaces = make(map[string]*ServiceInterface)
-	p.DataTypes = make(map[string]*DataType)
+	p.DataTypes = make(map[string]*mod.DataType)
 	p.Services = make(map[int]*Service)
 	return p, nil
 }
