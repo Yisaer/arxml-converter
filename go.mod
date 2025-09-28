@@ -7,7 +7,7 @@ toolchain go1.24.5
 require (
 	github.com/beevik/etree v1.6.0
 	github.com/stretchr/testify v1.11.1
-	github.com/yisaer/idl-parser v0.0.12
+	github.com/yisaer/idl-parser v0.0.13
 )
 
 require (
