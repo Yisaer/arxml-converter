@@ -112,7 +112,7 @@ func (c *ArXMLConverter) DecodeWithID(serviceID, eventID int, data []byte) (inte
 	if err != nil {
 		return nil, err
 	}
-	result, _, err := c.idlConverter.ParseDataByType(data, t, *c.idlModule, true)
+	result, _, err := c.idlConverter.ParseDataByType(data, t, *c.idlModule)
 	return result, err
 }
 
