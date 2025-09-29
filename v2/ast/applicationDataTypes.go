@@ -17,9 +17,7 @@ func (p *Parser) parseApplicationDatatypes(root *etree.Element) error {
 		if err := p.ParseApplicationPrimitiveDataType(apdt); err != nil {
 			return fmt.Errorf("parse index %v APPLICATION-PRIMITIVE-DATA-TYPE failed, err:%v", index, err.Error())
 		}
-
 	}
-
 	return nil
 }
 
