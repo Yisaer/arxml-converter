@@ -73,6 +73,22 @@ func (p *Parser) parseDataType(d *etree.Element) (*mod.DataType, error) {
 			}
 			dt.StringSize = as
 		}
+	case "VECTOR":
+		args := d.SelectElement("TEMPLATE-ARGUMENTS")
+		if args == nil {
+			return nil, fmt.Errorf("no TEMPLATE-ARGUMENTS")
+		}
+		cppArgs := args.SelectElement("CPP-TEMPLATE-ARGUMENT")
+		if cppArgs == nil {
+			return nil, fmt.Errorf("no CPP-TEMPLATE-ARGUMENT in TEMPLATE-ARGUMENTS")
+		}
+		typRef := cppArgs.SelectElement("TEMPLATE-TYPE-REF")
+		if typRef == nil {
+			return nil, fmt.Errorf("no TEMPLATE-TYPE-REF in CPP-TEMPLATE-ARGUMENT")
+		}
+		dt.Vector = &mod.Vector{
+			RefType: typRef.Text(),
+		}
 	case "ARRAY":
 		arraySize := d.SelectElement("ARRAY-SIZE")
 		if arraySize == nil {
