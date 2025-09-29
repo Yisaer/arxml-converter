@@ -14,7 +14,10 @@ type Parser struct {
 
 	implementationDataTypesArPackage *etree.Element
 	applicationDatatypeArPackage     *etree.Element
-	implementationDataTypes          map[string]*mod.DataType
+	dataTypeMappingSetsArPackage     *etree.Element
+
+	implementationDataTypes map[string]*mod.DataType
+	dataTypeMappings        map[string]string
 }
 
 func NewParser(path string) (*Parser, error) {
