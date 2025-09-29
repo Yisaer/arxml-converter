@@ -21,13 +21,18 @@ func (p *Parser) parseDataTypes(root *etree.Element) error {
 			p.implementationDataTypesArPackage = arpkg
 		case "ApplicationDataTypes":
 			p.applicationDatatypeArPackage = arpkg
+		case "DataTypeMappingSets":
+			p.dataTypeMappingSetsArPackage = arpkg
 		}
+	}
+	if err := p.parseDataTypeMappingSets(p.dataTypeMappingSetsArPackage); err != nil {
+		return fmt.Errorf("parse dataTypeMappingSets failed, err:%v", err.Error())
 	}
 	if err := p.parseImplementationDataTypes(p.implementationDataTypesArPackage); err != nil {
 		return fmt.Errorf("parse ImplementationDataTypes failed, err:%v", err.Error())
 	}
 	if err := p.parseApplicationDatatypes(p.applicationDatatypeArPackage); err != nil {
-		return fmt.Errorf("parsing application data types: %w", err)
+		return fmt.Errorf("parse application data types: %w", err)
 	}
 	return nil
 }
