@@ -5,7 +5,7 @@ import (
 
 	"github.com/beevik/etree"
 
-	"arxml-converter/mod"
+	"github.com/yisaer/arxml-converter/mod"
 )
 
 func (p *Parser) parseImplementationDataTypes(root *etree.Element) error {

@@ -7,8 +7,8 @@ import (
 	"github.com/yisaer/idl-parser/ast/typeref"
 	"github.com/yisaer/idl-parser/converter"
 
-	"arxml-converter/ast"
-	"arxml-converter/mod"
+	"github.com/yisaer/arxml-converter/ast"
+	"github.com/yisaer/arxml-converter/mod"
 )
 
 type ArXMLConverter struct {

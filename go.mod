@@ -1,4 +1,4 @@
-module arxml-converter
+module github.com/yisaer/arxml-converter
 
 go 1.24.1
 
