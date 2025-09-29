@@ -4,7 +4,8 @@ type DataType struct {
 	ShorName string `json:"short_name"`
 	Category string `json:"category"`
 	*TypReference
-	*Array
+	Array *Array
+	*Vector
 	*Structure
 }
 
@@ -36,6 +37,10 @@ func NewStringDataType(shortname, category string, stringSize int64) *DataType {
 type TypReference struct {
 	Ref        string `json:"ref"`
 	StringSize int64  `json:"string_size"`
+}
+
+type Vector struct {
+	RefType string `json:"ref_type"`
 }
 
 type Array struct {

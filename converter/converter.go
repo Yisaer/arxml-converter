@@ -42,52 +42,53 @@ func NewConverter(path string, config converter.IDlConverterConfig) (*ArXMLConve
 	return c, nil
 }
 
-func (c *ArXMLConverter) DecodeWithID(serviceID, eventID int, data []byte) (interface{}, error) {
-	t, err := c.GetTypeByID(serviceID, eventID)
+func (c *ArXMLConverter) DecodeWithID(serviceID, eventID int, data []byte) (string, interface{}, error) {
+	name, t, err := c.GetTypeByID(serviceID, eventID)
 	if err != nil {
-		return nil, err
+		return "", nil, err
 	}
+
 	result, _, err := c.idlConverter.ParseDataByType(data, t, *c.idlModule)
-	return result, err
+	return name, result, err
 }
 
-func (c *ArXMLConverter) GetTypeByID(serviceID, eventID int) (typeref.TypeRef, error) {
+func (c *ArXMLConverter) GetTypeByID(serviceID, eventID int) (string, typeref.TypeRef, error) {
 	svc, ok := c.Parser.Services[serviceID]
 	if !ok {
-		return nil, fmt.Errorf("service %v not found", serviceID)
+		return "", nil, fmt.Errorf("service %v not found", serviceID)
 	}
 	interfaceRef := mod.ExtractTypeNameFromRef(svc.ServiceInterfaceRef)
 	targetInterface, ok := c.Parser.Interfaces[interfaceRef]
 	if !ok {
-		return nil, fmt.Errorf("interface %v not found for serviceID %v", interfaceRef, serviceID)
+		return "", nil, fmt.Errorf("interface %v not found for serviceID %v", interfaceRef, serviceID)
 	}
 	event, ok := svc.Events[eventID]
 	if ok {
 		eventRef := mod.ExtractTypeNameFromRef(event.EventRef)
 		targetEvent, ok := targetInterface.Events[eventRef]
 		if !ok {
-			return nil, fmt.Errorf("event %v not found in interface %v", eventRef, targetInterface.Shortname)
+			return "", nil, fmt.Errorf("event %v not found in interface %v", eventRef, targetInterface.Shortname)
 		}
 		typeRef := mod.ExtractTypeNameFromRef(targetEvent.TypeRef)
 		targetTypRef, ok := c.transformer.GetConverterRef()[typeRef]
 		if !ok {
-			return nil, fmt.Errorf("type %v not found in interface %v event %v", typeRef, interfaceRef, eventRef)
+			return "", nil, fmt.Errorf("type %v not found in interface %v event %v", typeRef, interfaceRef, eventRef)
 		}
-		return targetTypRef, nil
+		return event.ShortName, targetTypRef, nil
 	}
 	fieldNotify, ok := svc.FieldNotify[eventID]
 	if ok {
 		fieldNotifyRef := mod.ExtractTypeNameFromRef(fieldNotify.FieldRef)
 		targetField, ok := targetInterface.Fields[fieldNotifyRef]
 		if !ok {
-			return nil, fmt.Errorf("field %v not found in interface %v", fieldNotifyRef, targetInterface.Shortname)
+			return "", nil, fmt.Errorf("field %v not found in interface %v", fieldNotifyRef, targetInterface.Shortname)
 		}
 		typeRef := mod.ExtractTypeNameFromRef(targetField.TypeRef)
 		targetTypRef, ok := c.transformer.GetConverterRef()[typeRef]
 		if !ok {
-			return nil, fmt.Errorf("type %v not found in interface %v field %v", typeRef, interfaceRef, fieldNotifyRef)
+			return "", nil, fmt.Errorf("type %v not found in interface %v field %v", typeRef, interfaceRef, fieldNotifyRef)
 		}
-		return targetTypRef, nil
+		return fieldNotify.ShortName, targetTypRef, nil
 	}
-	return nil, fmt.Errorf("unknown eventID:%v in serviceID:%v", serviceID, eventID)
+	return "", nil, fmt.Errorf("unknown eventID:%v in serviceID:%v", serviceID, eventID)
 }

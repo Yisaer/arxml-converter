@@ -27,7 +27,7 @@ func (t *TransformHelper) GetConverterRef() map[string]typeref.TypeRef {
 
 func (t *TransformHelper) TransformIntoModule() (*idlAst.Module, error) {
 	for _, dt := range t.DataTypes {
-		if dt.Category != "ARRAY" {
+		if dt.Category != "ARRAY" && dt.Category != "VECTOR" {
 			typeRef, err := t.convertDataTypeToTypeRef(dt)
 			if err != nil {
 				return nil, fmt.Errorf("failed to convert datatype %s: %w", dt.ShorName, err)
@@ -36,7 +36,7 @@ func (t *TransformHelper) TransformIntoModule() (*idlAst.Module, error) {
 		}
 	}
 	for _, dt := range t.DataTypes {
-		if dt.Category == "ARRAY" {
+		if dt.Category == "ARRAY" || dt.Category == "VECTOR" {
 			typeRef, err := t.convertDataTypeToTypeRef(dt)
 			if err != nil {
 				return nil, fmt.Errorf("failed to convert datatype %s: %w", dt.ShorName, err)
@@ -109,6 +109,8 @@ func (t *TransformHelper) convertDataTypeToTypeRef(dt *DataType) (typeref.TypeRe
 		return t.convertTypReference(dt.TypReference)
 	case "ARRAY":
 		return t.convertArray(dt.Array)
+	case "VECTOR":
+		return t.convertVector(dt.Vector)
 	case "STRUCTURE":
 		return t.convertStructure(dt.Structure, dt.ShorName)
 	default:
@@ -138,6 +140,17 @@ func (t *TransformHelper) convertArray(arr *Array) (typeref.TypeRef, error) {
 	}
 	if arr.ArraySize > 0 {
 		return typeref.NewArrayType(innerType, int(arr.ArraySize)), nil
+	}
+	return typeref.NewSequence(innerType), nil
+}
+
+func (t *TransformHelper) convertVector(v *Vector) (typeref.TypeRef, error) {
+	if v == nil {
+		return nil, fmt.Errorf("vector is nil")
+	}
+	innerType, err := t.convertRefToTypeRef(v.RefType)
+	if err != nil {
+		return nil, fmt.Errorf("failed to convert array inner type: %w", err)
 	}
 	return typeref.NewSequence(innerType), nil
 }
