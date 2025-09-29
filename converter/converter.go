@@ -2,68 +2,20 @@ package converter
 
 import (
 	"fmt"
-	"strings"
 
 	idlAst "github.com/yisaer/idl-parser/ast"
 	"github.com/yisaer/idl-parser/ast/typeref"
 	"github.com/yisaer/idl-parser/converter"
 
 	"arxml-converter/ast"
+	"arxml-converter/mod"
 )
-
-type FieldRefType int
-
-const (
-	StringType FieldRefType = iota
-	BoolType
-	FloatType
-	DoubleType
-	Int8Type
-	Int16Type
-	Int32Type
-	Int64Type
-	Uint8Type
-	Uint16Type
-	Uint32Type
-	Uint64Type
-)
-
-func (ft FieldRefType) String() string {
-	switch ft {
-	case StringType:
-		return "String"
-	case BoolType:
-		return "Bool"
-	case FloatType:
-		return "Float"
-	case DoubleType:
-		return "Double"
-	case Int8Type:
-		return "Int8"
-	case Int16Type:
-		return "Int16"
-	case Int32Type:
-		return "Int32"
-	case Int64Type:
-		return "Int64"
-	case Uint8Type:
-		return "Uint8"
-	case Uint16Type:
-		return "Uint16"
-	case Uint32Type:
-		return "Uint32"
-	case Uint64Type:
-		return "Uint64"
-	default:
-		return "Unknown"
-	}
-}
 
 type ArXMLConverter struct {
-	Parser            *ast.Parser
-	convertedTypeRefs map[string]typeref.TypeRef
-	idlModule         *idlAst.Module
-	idlConverter      *converter.IDLConverter
+	Parser       *ast.Parser
+	idlModule    *idlAst.Module
+	idlConverter *converter.IDLConverter
+	transformer  *mod.TransformHelper
 }
 
 func NewConverter(path string, config converter.IDlConverterConfig) (*ArXMLConverter, error) {
@@ -72,31 +24,14 @@ func NewConverter(path string, config converter.IDlConverterConfig) (*ArXMLConve
 		return nil, err
 	}
 	c := &ArXMLConverter{
-		Parser:            parser,
-		convertedTypeRefs: make(map[string]typeref.TypeRef),
+		Parser: parser,
 	}
 	if err := c.Parser.Parse(); err != nil {
 		return nil, err
 	}
-	for _, dt := range c.Parser.DataTypes {
-		if dt.Category != "ARRAY" {
-			typeRef, err := c.convertDataTypeToTypeRef(dt)
-			if err != nil {
-				return nil, fmt.Errorf("failed to convert datatype %s: %w", dt.ShorName, err)
-			}
-			c.convertedTypeRefs[strings.ToLower(dt.ShorName)] = typeRef
-		}
-	}
-	for _, dt := range c.Parser.DataTypes {
-		if dt.Category == "ARRAY" {
-			typeRef, err := c.convertDataTypeToTypeRef(dt)
-			if err != nil {
-				return nil, fmt.Errorf("failed to convert datatype %s: %w", dt.ShorName, err)
-			}
-			c.convertedTypeRefs[strings.ToLower(dt.ShorName)] = typeRef
-		}
-	}
-	c.idlModule, err = c.TransformToIDLModule()
+	transformerHelper := mod.NewTransformHelper(c.Parser.DataTypes)
+	c.transformer = transformerHelper
+	c.idlModule, err = c.transformer.TransformIntoModule()
 	if err != nil {
 		return nil, err
 	}
@@ -121,20 +56,20 @@ func (c *ArXMLConverter) GetTypeByID(serviceID, eventID int) (typeref.TypeRef, e
 	if !ok {
 		return nil, fmt.Errorf("service %v not found", serviceID)
 	}
-	interfaceRef := strings.ToLower(extractTypeNameFromRef(svc.ServiceInterfaceRef))
+	interfaceRef := mod.ExtractTypeNameFromRef(svc.ServiceInterfaceRef)
 	targetInterface, ok := c.Parser.Interfaces[interfaceRef]
 	if !ok {
 		return nil, fmt.Errorf("interface %v not found for serviceID %v", interfaceRef, serviceID)
 	}
 	event, ok := svc.Events[eventID]
 	if ok {
-		eventRef := strings.ToLower(extractTypeNameFromRef(event.EventRef))
+		eventRef := mod.ExtractTypeNameFromRef(event.EventRef)
 		targetEvent, ok := targetInterface.Events[eventRef]
 		if !ok {
 			return nil, fmt.Errorf("event %v not found in interface %v", eventRef, targetInterface.Shortname)
 		}
-		typeRef := strings.ToLower(extractTypeNameFromRef(targetEvent.TypeRef))
-		targetTypRef, ok := c.convertedTypeRefs[typeRef]
+		typeRef := mod.ExtractTypeNameFromRef(targetEvent.TypeRef)
+		targetTypRef, ok := c.transformer.GetConverterRef()[typeRef]
 		if !ok {
 			return nil, fmt.Errorf("type %v not found in interface %v event %v", typeRef, interfaceRef, eventRef)
 		}
@@ -142,13 +77,13 @@ func (c *ArXMLConverter) GetTypeByID(serviceID, eventID int) (typeref.TypeRef, e
 	}
 	fieldNotify, ok := svc.FieldNotify[eventID]
 	if ok {
-		fieldNotifyRef := strings.ToLower(extractTypeNameFromRef(fieldNotify.FieldRef))
+		fieldNotifyRef := mod.ExtractTypeNameFromRef(fieldNotify.FieldRef)
 		targetField, ok := targetInterface.Fields[fieldNotifyRef]
 		if !ok {
 			return nil, fmt.Errorf("field %v not found in interface %v", fieldNotifyRef, targetInterface.Shortname)
 		}
-		typeRef := strings.ToLower(extractTypeNameFromRef(targetField.TypeRef))
-		targetTypRef, ok := c.convertedTypeRefs[typeRef]
+		typeRef := mod.ExtractTypeNameFromRef(targetField.TypeRef)
+		targetTypRef, ok := c.transformer.GetConverterRef()[typeRef]
 		if !ok {
 			return nil, fmt.Errorf("type %v not found in interface %v field %v", typeRef, interfaceRef, fieldNotifyRef)
 		}
