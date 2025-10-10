@@ -37,7 +37,7 @@ func (p *Parser) parseDataTypeMappingSets(node *etree.Element) error {
 }
 
 var (
-	appDataTypePrefix       = "/DataTypes/ApplicationDataTypes/"
+	appDataTypePrefix       = "/DataTypes/ApplicationDataType/"
 	implementDataTypePrefix = "/DataTypes/ImplementationDataTypes/"
 )
 
