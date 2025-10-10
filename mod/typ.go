@@ -9,6 +9,27 @@ type DataType struct {
 	*Structure
 }
 
+func NewArrayDataType(shortname, category, arrayRef string, arraySize int64) *DataType {
+	dt := &DataType{
+		ShorName: shortname,
+		Category: category,
+		Array: &Array{
+			ArraySize: arraySize,
+			RefType:   arrayRef,
+		},
+	}
+	return dt
+}
+
+func NewStructureDataType(shortname, category string, s *Structure) *DataType {
+	dt := &DataType{
+		ShorName: shortname,
+		Category: category,
+	}
+	dt.Structure = s
+	return dt
+}
+
 func NewBasicDataType(shortname, category string, ref string) *DataType {
 	dt := &DataType{
 		ShorName: shortname,

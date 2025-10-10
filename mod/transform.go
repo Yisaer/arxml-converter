@@ -104,14 +104,14 @@ func (t *TransformHelper) createTypeRef(ref string) (typeref.TypeRef, error) {
 
 // convertDataTypeToTypeRef 将 ArXML DataType 转换为 typeref.TypeRef
 func (t *TransformHelper) convertDataTypeToTypeRef(dt *DataType) (typeref.TypeRef, error) {
-	switch dt.Category {
-	case "TYPE_REFERENCE":
+	switch {
+	case dt.Category == "TYPE_REFERENCE" || dt.TypReference != nil:
 		return t.convertTypReference(dt.TypReference)
-	case "ARRAY":
+	case dt.Category == "ARRAY":
 		return t.convertArray(dt.Array)
-	case "VECTOR":
+	case dt.Category == "VECTOR":
 		return t.convertVector(dt.Vector)
-	case "STRUCTURE":
+	case dt.Category == "STRUCTURE":
 		return t.convertStructure(dt.Structure, dt.ShorName)
 	default:
 		return nil, fmt.Errorf("unsupported category: %s", dt.Category)

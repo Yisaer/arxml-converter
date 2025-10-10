@@ -8,7 +8,7 @@ import (
 	"github.com/yisaer/arxml-converter/mod"
 )
 
-func (p *Parser) parseImplementationDataTypes(root *etree.Element) error {
+func (p *DataTypesParser) parseImplementationDataTypes(root *etree.Element) error {
 	elements := root.SelectElement("ELEMENTS")
 	if elements == nil {
 		return fmt.Errorf("no elements found")
@@ -18,14 +18,14 @@ func (p *Parser) parseImplementationDataTypes(root *etree.Element) error {
 		return fmt.Errorf("no IMPLEMENTATION-DATA-TYPE found")
 	}
 	for index, idt := range idts {
-		if err := p.parseImplementationDataType(idt); err != nil {
+		if err := p.parseImplementationValueDataType(idt); err != nil {
 			return fmt.Errorf("parse %v ImplementationDataType failed, err:%v", index, err.Error())
 		}
 	}
 	return nil
 }
 
-func (p *Parser) parseImplementationDataType(root *etree.Element) (err error) {
+func (p *DataTypesParser) parseImplementationValueDataType(root *etree.Element) (err error) {
 	sn, err := p.getShortname(root)
 	if err != nil {
 		return err

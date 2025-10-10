@@ -6,32 +6,35 @@ import (
 	"github.com/beevik/etree"
 )
 
-func (p *Parser) parseDataTypes(root *etree.Element) error {
-	arpackages := root.SelectElements("AR-PACKAGES")
-	if len(arpackages) < 1 {
-		return fmt.Errorf("no ar-packages found")
+func (dp *DataTypesParser) parseDataTypes(root *etree.Element) error {
+	arpackagesElement := root.SelectElement("AR-PACKAGES")
+	if arpackagesElement == nil {
+		return fmt.Errorf("AR-PACKAGES element not found")
 	}
+	arpackages := arpackagesElement.SelectElements("AR-PACKAGE")
 	for index, arpkg := range arpackages {
-		shortname, err := p.getShortname(arpkg)
+		shortname, err := dp.getShortname(arpkg)
 		if err != nil {
 			return fmt.Errorf("could not get short name for ar-packages[%d]", index)
 		}
 		switch shortname {
 		case "ImplementationDataTypes":
-			p.implementationDataTypesArPackage = arpkg
-		case "ApplicationDataTypes":
-			p.applicationDatatypeArPackage = arpkg
-		case "DataTypeMappingSets":
-			p.dataTypeMappingSetsArPackage = arpkg
+			dp.implementationDataTypesArPackage = arpkg
+		case "ApplicationDataType":
+			dp.applicationDatatypeArPackage = arpkg
 		}
 	}
-	if err := p.parseDataTypeMappingSets(p.dataTypeMappingSetsArPackage); err != nil {
-		return fmt.Errorf("parse dataTypeMappingSets failed, err:%v", err.Error())
+	if dp.implementationDataTypesArPackage == nil {
+		return fmt.Errorf("no implementationDataTypes found in AR-PACKAGES")
 	}
-	if err := p.parseImplementationDataTypes(p.implementationDataTypesArPackage); err != nil {
+	if dp.applicationDatatypeArPackage == nil {
+		return fmt.Errorf("no applicationDataTypes found in AR-PACKAGES")
+	}
+
+	if err := dp.parseImplementationDataTypes(dp.implementationDataTypesArPackage); err != nil {
 		return fmt.Errorf("parse ImplementationDataTypes failed, err:%v", err.Error())
 	}
-	if err := p.parseApplicationDatatypes(p.applicationDatatypeArPackage); err != nil {
+	if err := dp.parseApplicationDatatypes(dp.applicationDatatypeArPackage); err != nil {
 		return fmt.Errorf("parse application data types: %w", err)
 	}
 	return nil
