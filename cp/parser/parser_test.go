@@ -23,4 +23,6 @@ func TestParser(t *testing.T) {
 	fmt.Println(p.topologyParser.GetHeaderRef())
 	fmt.Println(p.topologyParser.GetPDUTriggeringRef())
 	fmt.Println(p.communicationParser.GetPduRefMap())
+	fmt.Println(p.systemParser.GetOperationRef())
+	fmt.Println(p.softwareTypesParser.GetInterfaceRefMap())
 }

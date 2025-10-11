@@ -7,6 +7,8 @@ import (
 
 	"github.com/yisaer/arxml-converter/cp/parser/communication"
 	"github.com/yisaer/arxml-converter/cp/parser/datatypes"
+	"github.com/yisaer/arxml-converter/cp/parser/softwareTypes"
+	"github.com/yisaer/arxml-converter/cp/parser/system"
 	"github.com/yisaer/arxml-converter/cp/parser/topology"
 )
 
@@ -17,10 +19,14 @@ type Parser struct {
 	dataTypeMappingSetsElement *etree.Element
 	topologyElement            *etree.Element
 	communicationElement       *etree.Element
+	systemElement              *etree.Element
+	softwareTypesElement       *etree.Element
 
 	dataTypesParser     *datatypes.DataTypesParser
 	topologyParser      *topology.TopoLogyParser
 	communicationParser *communication.CommunicationParser
+	systemParser        *system.SystemParser
+	softwareTypesParser *softwareTypes.SoftwareTypesParser
 
 	dataTypeMappings map[string]string
 }
@@ -71,6 +77,14 @@ func (p *Parser) parse() error {
 	p.communicationParser = communication.NewCommunicationParser()
 	if err := p.communicationParser.ParseCommunication(p.communicationElement); err != nil {
 		return fmt.Errorf("parse communication: %w", err)
+	}
+	p.systemParser = system.NewSystemParser()
+	if err := p.systemParser.ParseSystem(p.systemElement); err != nil {
+		return fmt.Errorf("parse system: %w", err)
+	}
+	p.softwareTypesParser = softwareTypes.NewSoftwareTypesParser()
+	if err := p.softwareTypesParser.ParseSoftwareTypes(p.softwareTypesElement); err != nil {
+		return fmt.Errorf("parse softwareTypes: %w", err)
 	}
 	return nil
 }

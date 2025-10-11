@@ -68,6 +68,36 @@ func (p *Parser) searchCommunication(arPackagesElement *etree.Element) error {
 	return fmt.Errorf("no Communication found")
 }
 
+func (p *Parser) searchSystem(arPackagesElement *etree.Element) error {
+	arPackages := arPackagesElement.SelectElements("AR-PACKAGE")
+	for _, arPackage := range arPackages {
+		sn, err := util.GetShortname(arPackage)
+		if err != nil {
+			return err
+		}
+		if sn == "System" {
+			p.systemElement = arPackage
+			return nil
+		}
+	}
+	return fmt.Errorf("no System found")
+}
+
+func (p *Parser) searchSoftwareTypes(arPackagesElement *etree.Element) error {
+	arPackages := arPackagesElement.SelectElements("AR-PACKAGE")
+	for _, arPackage := range arPackages {
+		sn, err := util.GetShortname(arPackage)
+		if err != nil {
+			return err
+		}
+		if sn == "SoftwareTypes" {
+			p.softwareTypesElement = arPackage
+			return nil
+		}
+	}
+	return fmt.Errorf("no SoftwareTypes found")
+}
+
 func (p *Parser) search(arPackages *etree.Element) error {
 	if err := p.searchDataTypes(arPackages); err != nil {
 		return fmt.Errorf("search data types: %w", err)
@@ -80,6 +110,12 @@ func (p *Parser) search(arPackages *etree.Element) error {
 	}
 	if err := p.searchCommunication(arPackages); err != nil {
 		return fmt.Errorf("search communication: %w", err)
+	}
+	if err := p.searchSystem(arPackages); err != nil {
+		return fmt.Errorf("search system: %w", err)
+	}
+	if err := p.searchSoftwareTypes(arPackages); err != nil {
+		return fmt.Errorf("search software types: %w", err)
 	}
 	return nil
 }
