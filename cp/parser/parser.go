@@ -5,7 +5,8 @@ import (
 
 	"github.com/beevik/etree"
 
-	"github.com/yisaer/arxml-converter/util"
+	"github.com/yisaer/arxml-converter/cp/parser/datatypes"
+	"github.com/yisaer/arxml-converter/cp/parser/topology"
 )
 
 type Parser struct {
@@ -13,8 +14,10 @@ type Parser struct {
 	Doc                        *etree.Document
 	dataTypesElement           *etree.Element
 	dataTypeMappingSetsElement *etree.Element
+	topologyElement            *etree.Element
 
-	dataTypesParser *DataTypesParser
+	dataTypesParser *datatypes.DataTypesParser
+	topologyParser  *topology.TopoLogyParser
 
 	dataTypeMappings map[string]string
 }
@@ -28,7 +31,6 @@ func NewParser(path string) (*Parser, error) {
 		Path: path, Doc: doc,
 		dataTypeMappings: make(map[string]string),
 	}
-	p.dataTypesParser = NewDataTypesParser(p)
 	return p, nil
 }
 
@@ -51,52 +53,17 @@ func (p *Parser) Parse() error {
 	return nil
 }
 
-func (p *Parser) searchDataTypes(arPackagesElement *etree.Element) error {
-	arPackages := arPackagesElement.SelectElements("AR-PACKAGE")
-	for _, arPackage := range arPackages {
-		sn, err := util.GetShortname(arPackage)
-		if err != nil {
-			return err
-		}
-		if sn == "DataTypes" {
-			p.dataTypesElement = arPackage
-			return nil
-		}
-	}
-	return fmt.Errorf("no DataTypes found")
-}
-
-func (p *Parser) searchDataTypeMappingSets(arPackagesElement *etree.Element) error {
-	arPackages := arPackagesElement.SelectElements("AR-PACKAGE")
-	for _, arPackage := range arPackages {
-		sn, err := util.GetShortname(arPackage)
-		if err != nil {
-			return err
-		}
-		if sn == "DataTypeMappingSets" {
-			p.dataTypeMappingSetsElement = arPackage
-			return nil
-		}
-	}
-	return fmt.Errorf("no DataTypes found")
-}
-
-func (p *Parser) search(arPackages *etree.Element) error {
-	if err := p.searchDataTypes(arPackages); err != nil {
-		return fmt.Errorf("search data types: %w", err)
-	}
-	if err := p.searchDataTypeMappingSets(arPackages); err != nil {
-		return fmt.Errorf("search data types mappings: %w", err)
-	}
-	return nil
-}
-
 func (p *Parser) parse() error {
 	if err := p.parseDataTypeMappingSets(p.dataTypeMappingSetsElement); err != nil {
 		return fmt.Errorf("parse dataTypeMappingSets: %w", err)
 	}
-	if err := p.dataTypesParser.parseDataTypes(p.dataTypesElement); err != nil {
+	p.dataTypesParser = datatypes.NewDataTypesParser(p.dataTypeMappings)
+	if err := p.dataTypesParser.ParseDataTypes(p.dataTypesElement); err != nil {
 		return fmt.Errorf("parse dataTypes: %w", err)
+	}
+	p.topologyParser = topology.NewTopoLogyParser()
+	if err := p.topologyParser.ParseTopoLogy(p.topologyElement); err != nil {
+		return fmt.Errorf("parse topology: %w", err)
 	}
 	return nil
 }

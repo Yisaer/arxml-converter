@@ -1,4 +1,4 @@
-package parser
+package datatypes
 
 import (
 	"fmt"
@@ -11,21 +11,25 @@ import (
 )
 
 type DataTypesParser struct {
-	*Parser
-
 	implementationDataTypesArPackage *etree.Element
 	applicationDatatypeArPackage     *etree.Element
 
 	applicationDataTypes    map[string]*ast.DataType
 	implementationDataTypes map[string]*ast.DataType
+
+	dataTypeMappings map[string]string
 }
 
-func NewDataTypesParser(parser *Parser) *DataTypesParser {
+func NewDataTypesParser(dataTypeMappings map[string]string) *DataTypesParser {
 	return &DataTypesParser{
-		Parser:                  parser,
+		dataTypeMappings:        dataTypeMappings,
 		applicationDataTypes:    make(map[string]*ast.DataType),
 		implementationDataTypes: make(map[string]*ast.DataType),
 	}
+}
+
+func (dp *DataTypesParser) GetApplicationDataTypes() map[string]*ast.DataType {
+	return dp.applicationDataTypes
 }
 
 func (dp *DataTypesParser) parseApplicationDatatypes(root *etree.Element) error {
@@ -113,7 +117,7 @@ func (dp *DataTypesParser) ParseApplicationDataType(root *etree.Element) (err er
 		if typeRef == nil {
 			return fmt.Errorf("no TYPE-TREF found for sn %v", sn)
 		}
-		arrayRef := strings.TrimPrefix(typeRef.Text(), appDataTypePrefix)
+		arrayRef := strings.TrimPrefix(typeRef.Text(), util.AppDataTypePrefix)
 		isDynamicArray, err := util.GetArraySizeSemantics(element)
 		if err != nil {
 			return err
@@ -142,7 +146,7 @@ func (dp *DataTypesParser) ParseApplicationDataType(root *etree.Element) (err er
 			if typeRef == nil {
 				return fmt.Errorf("no TYPE-REF found for sn %v", recordSN)
 			}
-			ref.Ref = strings.TrimPrefix(typeRef.Text(), appDataTypePrefix)
+			ref.Ref = strings.TrimPrefix(typeRef.Text(), util.AppDataTypePrefix)
 			s.STRList = append(s.STRList, ref)
 		}
 		dp.applicationDataTypes[sn] = ast.NewStructureDataType(sn, category, s)
