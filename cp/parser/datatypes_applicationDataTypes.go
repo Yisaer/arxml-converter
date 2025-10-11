@@ -1,4 +1,4 @@
-package ast
+package parser
 
 import (
 	"fmt"
@@ -6,7 +6,8 @@ import (
 
 	"github.com/beevik/etree"
 
-	"github.com/yisaer/arxml-converter/mod"
+	"github.com/yisaer/arxml-converter/ast"
+	"github.com/yisaer/arxml-converter/util"
 )
 
 type DataTypesParser struct {
@@ -15,20 +16,20 @@ type DataTypesParser struct {
 	implementationDataTypesArPackage *etree.Element
 	applicationDatatypeArPackage     *etree.Element
 
-	applicationDataTypes    map[string]*mod.DataType
-	implementationDataTypes map[string]*mod.DataType
+	applicationDataTypes    map[string]*ast.DataType
+	implementationDataTypes map[string]*ast.DataType
 }
 
 func NewDataTypesParser(parser *Parser) *DataTypesParser {
 	return &DataTypesParser{
 		Parser:                  parser,
-		applicationDataTypes:    make(map[string]*mod.DataType),
-		implementationDataTypes: make(map[string]*mod.DataType),
+		applicationDataTypes:    make(map[string]*ast.DataType),
+		implementationDataTypes: make(map[string]*ast.DataType),
 	}
 }
 
 func (dp *DataTypesParser) parseApplicationDatatypes(root *etree.Element) error {
-	elements, err := dp.getElements(root)
+	elements, err := util.GetElements(root)
 	if err != nil {
 		return err
 	}
@@ -52,7 +53,7 @@ func (dp *DataTypesParser) parseApplicationDatatypes(root *etree.Element) error 
 }
 
 func (dp *DataTypesParser) ParseApplicationDataType(root *etree.Element) (err error) {
-	sn, err := dp.Parser.getShortname(root)
+	sn, err := util.GetShortname(root)
 	if err != nil {
 		return err
 	}
@@ -62,13 +63,13 @@ func (dp *DataTypesParser) ParseApplicationDataType(root *etree.Element) (err er
 		}
 	}()
 
-	category, err := dp.Parser.getCategory(root)
+	category, err := util.GetCategory(root)
 	if err != nil {
 		return fmt.Errorf("parse category failed err:%v", err.Error())
 	}
 	switch category {
 	case "STRING":
-		sddpc, err := dp.Parser.getSWDataDefPropsConditional(root)
+		sddpc, err := util.GetSWDataDefPropsConditional(root)
 		if err != nil {
 			return err
 		}
@@ -76,7 +77,7 @@ func (dp *DataTypesParser) ParseApplicationDataType(root *etree.Element) (err er
 		if stp == nil {
 			return fmt.Errorf("no SW-TEXT-PROPS found")
 		}
-		isDynamicString, err := dp.Parser.getArraySizeSemantics(stp)
+		isDynamicString, err := util.GetArraySizeSemantics(stp)
 		if err != nil {
 			return err
 		}
@@ -91,7 +92,7 @@ func (dp *DataTypesParser) ParseApplicationDataType(root *etree.Element) (err er
 		if !strings.Contains(strings.ToUpper(btrRaw), "UTF_8") {
 			return fmt.Errorf("BASE-TYPE ref should be UTF_8, got:%v", btrRaw)
 		}
-		dp.applicationDataTypes[sn] = mod.NewStringDataType(sn, category, 0)
+		dp.applicationDataTypes[sn] = ast.NewStringDataType(sn, category, 0)
 	case "VALUE":
 		idtrKey, ok := dp.dataTypeMappings[sn]
 		if !ok {
@@ -113,26 +114,26 @@ func (dp *DataTypesParser) ParseApplicationDataType(root *etree.Element) (err er
 			return fmt.Errorf("no TYPE-TREF found for sn %v", sn)
 		}
 		arrayRef := strings.TrimPrefix(typeRef.Text(), appDataTypePrefix)
-		isDynamicArray, err := dp.Parser.getArraySizeSemantics(element)
+		isDynamicArray, err := util.GetArraySizeSemantics(element)
 		if err != nil {
 			return err
 		}
 		if !isDynamicArray {
 			return fmt.Errorf("fixed length array not supported now")
 		}
-		dp.applicationDataTypes[sn] = mod.NewArrayDataType(sn, category, arrayRef, 0)
+		dp.applicationDataTypes[sn] = ast.NewArrayDataType(sn, category, arrayRef, 0)
 	case "STRUCTURE":
 		elements := root.SelectElement("ELEMENTS")
 		if elements == nil {
 			return fmt.Errorf("no ELEMENTS found")
 		}
-		s := &mod.Structure{
-			STRList: make([]*mod.StructureTypRef, 0),
+		s := &ast.Structure{
+			STRList: make([]*ast.StructureTypRef, 0),
 		}
 		records := elements.SelectElements("APPLICATION-RECORD-ELEMENT")
 		for _, record := range records {
-			ref := &mod.StructureTypRef{}
-			recordSN, err := dp.Parser.getShortname(record)
+			ref := &ast.StructureTypRef{}
+			recordSN, err := util.GetShortname(record)
 			if err != nil {
 				return err
 			}
@@ -144,7 +145,7 @@ func (dp *DataTypesParser) ParseApplicationDataType(root *etree.Element) (err er
 			ref.Ref = strings.TrimPrefix(typeRef.Text(), appDataTypePrefix)
 			s.STRList = append(s.STRList, ref)
 		}
-		dp.applicationDataTypes[sn] = mod.NewStructureDataType(sn, category, s)
+		dp.applicationDataTypes[sn] = ast.NewStructureDataType(sn, category, s)
 	default:
 		return fmt.Errorf("unknown category:%v", category)
 	}

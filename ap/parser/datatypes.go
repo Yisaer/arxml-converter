@@ -1,4 +1,4 @@
-package ast
+package parser
 
 import (
 	"fmt"
@@ -7,7 +7,7 @@ import (
 
 	"github.com/beevik/etree"
 
-	"github.com/yisaer/arxml-converter/mod"
+	"github.com/yisaer/arxml-converter/ast"
 )
 
 func (p *Parser) searchDataTypes(arPackageElements []*etree.Element) error {
@@ -43,8 +43,8 @@ func (p *Parser) parseDataTypes() error {
 	return nil
 }
 
-func (p *Parser) parseDataType(d *etree.Element) (*mod.DataType, error) {
-	dt := &mod.DataType{}
+func (p *Parser) parseDataType(d *etree.Element) (*ast.DataType, error) {
+	dt := &ast.DataType{}
 	sn := d.SelectElement("SHORT-NAME")
 	if sn == nil {
 		return nil, fmt.Errorf("no SHORT-NAME in %v", d.Text())
@@ -61,7 +61,7 @@ func (p *Parser) parseDataType(d *etree.Element) (*mod.DataType, error) {
 		if ref == nil {
 			return nil, fmt.Errorf("no TYPE-REFERENCE-REF")
 		}
-		dt.TypReference = &mod.TypReference{Ref: ref.Text()}
+		dt.TypReference = &ast.TypReference{Ref: ref.Text()}
 		if strings.Contains(strings.ToLower(dt.TypReference.Ref), "string") {
 			stringSize := d.SelectElement("ARRAY-SIZE")
 			if stringSize == nil {
@@ -86,7 +86,7 @@ func (p *Parser) parseDataType(d *etree.Element) (*mod.DataType, error) {
 		if typRef == nil {
 			return nil, fmt.Errorf("no TEMPLATE-TYPE-REF in CPP-TEMPLATE-ARGUMENT")
 		}
-		dt.Vector = &mod.Vector{
+		dt.Vector = &ast.Vector{
 			RefType: typRef.Text(),
 		}
 	case "ARRAY":
@@ -118,7 +118,7 @@ func (p *Parser) parseDataType(d *etree.Element) (*mod.DataType, error) {
 		if typRef == nil {
 			return nil, fmt.Errorf("no TEMPLATE-TYPE-REF in CPP-TEMPLATE-ARGUMENT")
 		}
-		dt.Array = &mod.Array{
+		dt.Array = &ast.Array{
 			ArraySize: as,
 			Inplace:   ip,
 			RefType:   typRef.Text(),
@@ -133,17 +133,17 @@ func (p *Parser) parseDataType(d *etree.Element) (*mod.DataType, error) {
 	return dt, nil
 }
 
-func (p *Parser) ParseStructure(dt *mod.DataType, d *etree.Element) error {
+func (p *Parser) ParseStructure(dt *ast.DataType, d *etree.Element) error {
 	subElements := d.SelectElement("SUB-ELEMENTS")
 	if subElements == nil {
 		return fmt.Errorf("no SUB-ELEMENTS")
 	}
 	cppElements := subElements.SelectElements("CPP-IMPLEMENTATION-DATA-TYPE-ELEMENT")
-	dt.Structure = &mod.Structure{
-		STRList: make([]*mod.StructureTypRef, 0),
+	dt.Structure = &ast.Structure{
+		STRList: make([]*ast.StructureTypRef, 0),
 	}
 	for _, cppElement := range cppElements {
-		str := &mod.StructureTypRef{}
+		str := &ast.StructureTypRef{}
 		sn := cppElement.SelectElement("SHORT-NAME")
 		if sn == nil {
 			return fmt.Errorf("no SHORT-NAME")

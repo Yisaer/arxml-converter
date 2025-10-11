@@ -1,4 +1,4 @@
-package ast
+package util
 
 import (
 	"fmt"
@@ -7,7 +7,7 @@ import (
 	"github.com/beevik/etree"
 )
 
-func (p *Parser) getShortname(node *etree.Element) (string, error) {
+func GetShortname(node *etree.Element) (string, error) {
 	sn := node.SelectElement("SHORT-NAME")
 	if sn == nil {
 		return "", fmt.Errorf("no short name found")
@@ -19,7 +19,7 @@ func (p *Parser) getShortname(node *etree.Element) (string, error) {
 	return sname, nil
 }
 
-func (p *Parser) getCategory(node *etree.Element) (string, error) {
+func GetCategory(node *etree.Element) (string, error) {
 	sn := node.SelectElement("CATEGORY")
 	if sn == nil {
 		return "", fmt.Errorf("no CATEGORY found")
@@ -31,7 +31,7 @@ func (p *Parser) getCategory(node *etree.Element) (string, error) {
 	return sname, nil
 }
 
-func (p *Parser) getElements(node *etree.Element) (*etree.Element, error) {
+func GetElements(node *etree.Element) (*etree.Element, error) {
 	es := node.SelectElement("ELEMENTS")
 	if es == nil {
 		return nil, fmt.Errorf("no ELEMENTS found")
@@ -39,7 +39,7 @@ func (p *Parser) getElements(node *etree.Element) (*etree.Element, error) {
 	return es, nil
 }
 
-func (p *Parser) getSWDataDefPropsConditional(node *etree.Element) (*etree.Element, error) {
+func GetSWDataDefPropsConditional(node *etree.Element) (*etree.Element, error) {
 	sddp := node.SelectElement("SW-DATA-DEF-PROPS")
 	if sddp == nil {
 		return nil, fmt.Errorf("no SW-DATA-DEF-PROPS found")
@@ -55,7 +55,7 @@ func (p *Parser) getSWDataDefPropsConditional(node *etree.Element) (*etree.Eleme
 	return sddpc, nil
 }
 
-func (p *Parser) getArraySizeSemantics(node *etree.Element) (isDynamic bool, err error) {
+func GetArraySizeSemantics(node *etree.Element) (isDynamic bool, err error) {
 	ass := node.SelectElement("ARRAY-SIZE-SEMANTICS")
 	if ass == nil {
 		return false, fmt.Errorf("no ARRAY-SIZE-SEMANTICS found")
@@ -69,8 +69,8 @@ func (p *Parser) getArraySizeSemantics(node *etree.Element) (isDynamic bool, err
 	return false, fmt.Errorf("invalid ARRAY-SIZE-SEMANTICS:%v", ass.Text())
 }
 
-func (p *Parser) validBasicType(ref string) error {
-	typeName := extractTypeNameFromRef(ref)
+func ValidBasicType(ref string) error {
+	typeName := ExtractTypeNameFromRef(ref)
 	lowerName := strings.ToLower(typeName)
 	switch {
 	case strings.Contains(lowerName, "uint8"):
@@ -99,7 +99,7 @@ func (p *Parser) validBasicType(ref string) error {
 	return fmt.Errorf("invalid basic type:%v", ref)
 }
 
-func extractTypeNameFromRef(ref string) string {
+func ExtractTypeNameFromRef(ref string) string {
 	// 移除路径前缀，只保留最后的类型名
 	parts := strings.Split(ref, "/")
 	if len(parts) > 0 {

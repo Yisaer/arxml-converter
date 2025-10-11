@@ -1,9 +1,11 @@
-package ast
+package parser
 
 import (
 	"fmt"
 
 	"github.com/beevik/etree"
+
+	"github.com/yisaer/arxml-converter/util"
 )
 
 func (dp *DataTypesParser) parseDataTypes(root *etree.Element) error {
@@ -13,7 +15,7 @@ func (dp *DataTypesParser) parseDataTypes(root *etree.Element) error {
 	}
 	arpackages := arpackagesElement.SelectElements("AR-PACKAGE")
 	for index, arpkg := range arpackages {
-		shortname, err := dp.getShortname(arpkg)
+		shortname, err := util.GetShortname(arpkg)
 		if err != nil {
 			return fmt.Errorf("could not get short name for ar-packages[%d]", index)
 		}

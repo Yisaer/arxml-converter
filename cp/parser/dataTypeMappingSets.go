@@ -1,14 +1,16 @@
-package ast
+package parser
 
 import (
 	"fmt"
 	"strings"
 
 	"github.com/beevik/etree"
+
+	"github.com/yisaer/arxml-converter/util"
 )
 
 func (p *Parser) parseDataTypeMappingSets(node *etree.Element) error {
-	elements, err := p.getElements(node)
+	elements, err := util.GetElements(node)
 	if err != nil {
 		return err
 	}
@@ -16,7 +18,7 @@ func (p *Parser) parseDataTypeMappingSets(node *etree.Element) error {
 	if dtms == nil {
 		return fmt.Errorf("no DATA-TYPE-MAPPING-SET found")
 	}
-	sn, err := p.getShortname(dtms)
+	sn, err := util.GetShortname(dtms)
 	if err != nil {
 		return err
 	}
