@@ -2,6 +2,7 @@ package topology
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/beevik/etree"
 
@@ -11,16 +12,22 @@ import (
 type TopoLogyParser struct {
 	clusterArPackage *etree.Element
 	serviceIDMap     map[uint16]string
+	headerIdRef      map[uint32]string
 }
 
 func NewTopoLogyParser() *TopoLogyParser {
 	return &TopoLogyParser{
 		serviceIDMap: make(map[uint16]string),
+		headerIdRef:  make(map[uint32]string),
 	}
 }
 
 func (tp *TopoLogyParser) GetServiceIDMap() map[uint16]string {
 	return tp.serviceIDMap
+}
+
+func (tp *TopoLogyParser) GetHeaderRef() map[uint32]string {
+	return tp.headerIdRef
 }
 
 func (tp *TopoLogyParser) ParseTopoLogy(node *etree.Element) (err error) {
@@ -83,6 +90,7 @@ func (tp *TopoLogyParser) parseETHERNETPHYSICALCHANNEL(node *etree.Element) (err
 	if soAdConfigElement == nil {
 		return fmt.Errorf("SO-AD-CONFIG not found")
 	}
+	// parse service id
 	socketAddresssElement := soAdConfigElement.SelectElement("SOCKET-ADDRESSS")
 	if socketAddresssElement == nil {
 		return fmt.Errorf("SOCKET-ADDRESSS not found")
@@ -92,6 +100,59 @@ func (tp *TopoLogyParser) parseETHERNETPHYSICALCHANNEL(node *etree.Element) (err
 		if err := tp.parseSOCKETADDRESS(socketAddress); err != nil {
 			return fmt.Errorf("parse %v SOCKET-ADDRESS err: %v", index, err)
 		}
+	}
+
+	// parse header id
+	connectionBundlesElement := soAdConfigElement.SelectElement("CONNECTION-BUNDLES")
+	if connectionBundlesElement == nil {
+		return fmt.Errorf("CONNECTION-BUNDLES not found")
+	}
+	socketConnectionBundleList := connectionBundlesElement.SelectElements("SOCKET-CONNECTION-BUNDLE")
+	for index, socketConnectionBundle := range socketConnectionBundleList {
+		if err := tp.parseSOCKETCONNECTIONBUNDLE(socketConnectionBundle); err != nil {
+			return fmt.Errorf("parse %v SOCKET-CONNECTION-BUNDLE err :%v", index, err)
+		}
+	}
+
+	return nil
+}
+
+func (tp *TopoLogyParser) parseSOCKETCONNECTIONBUNDLE(node *etree.Element) (err error) {
+	bundleConnectionsElement := node.SelectElement("BUNDLED-CONNECTIONS")
+	if bundleConnectionsElement == nil {
+		return nil
+	}
+	socketConnectionElement := bundleConnectionsElement.SelectElement("SOCKET-CONNECTION")
+	if socketConnectionElement == nil {
+		return nil
+	}
+	pdusElement := socketConnectionElement.SelectElement("PDUS")
+	if pdusElement == nil {
+		return nil
+	}
+	socketConnectionIPDUIdentifierList := pdusElement.SelectElements("SOCKET-CONNECTION-IPDU-IDENTIFIER")
+	for index, scipdui := range socketConnectionIPDUIdentifierList {
+		if err := tp.parseSOCKETCONNECTIONIPDUIDENTIFIER(scipdui); err != nil {
+			return fmt.Errorf("parse %v SOCKET-CONNECTION-IPDU-IDENTIFIER err: %v", index, err)
+		}
+	}
+	return nil
+}
+
+func (tp *TopoLogyParser) parseSOCKETCONNECTIONIPDUIDENTIFIER(node *etree.Element) (err error) {
+
+	headerIDElement := node.SelectElement("HEADER-ID")
+	if headerIDElement == nil {
+		return fmt.Errorf("HEADER-ID not found")
+	}
+	headerID, err := util.ToUint32(headerIDElement.Text())
+	if err != nil {
+		return fmt.Errorf("parse HEADER-ID err: %v", err)
+	}
+	pduTriggeringRefElement := node.SelectElement("PDU-TRIGGERING-REF")
+	pduTriggeringRefElementRaw := pduTriggeringRefElement.Text()
+	if strings.Contains(pduTriggeringRefElementRaw, "call") {
+		tp.headerIdRef[headerID] = pduTriggeringRefElementRaw
 	}
 	return nil
 }

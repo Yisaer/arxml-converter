@@ -20,4 +20,5 @@ func TestParser(t *testing.T) {
 	v, _ := json.Marshal(m)
 	fmt.Println(string(v))
 	fmt.Println(p.topologyParser.GetServiceIDMap())
+	fmt.Println(p.topologyParser.GetHeaderRef())
 }
