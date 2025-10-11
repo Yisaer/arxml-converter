@@ -53,6 +53,21 @@ func (p *Parser) searchTopology(arPackagesElement *etree.Element) error {
 	return fmt.Errorf("no Topology found")
 }
 
+func (p *Parser) searchCommunication(arPackagesElement *etree.Element) error {
+	arPackages := arPackagesElement.SelectElements("AR-PACKAGE")
+	for _, arPackage := range arPackages {
+		sn, err := util.GetShortname(arPackage)
+		if err != nil {
+			return err
+		}
+		if sn == "Communication" {
+			p.communicationElement = arPackage
+			return nil
+		}
+	}
+	return fmt.Errorf("no Communication found")
+}
+
 func (p *Parser) search(arPackages *etree.Element) error {
 	if err := p.searchDataTypes(arPackages); err != nil {
 		return fmt.Errorf("search data types: %w", err)
@@ -62,6 +77,9 @@ func (p *Parser) search(arPackages *etree.Element) error {
 	}
 	if err := p.searchTopology(arPackages); err != nil {
 		return fmt.Errorf("search topology: %w", err)
+	}
+	if err := p.searchCommunication(arPackages); err != nil {
+		return fmt.Errorf("search communication: %w", err)
 	}
 	return nil
 }

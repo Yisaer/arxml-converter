@@ -107,3 +107,11 @@ func ExtractTypeNameFromRef(ref string) string {
 	}
 	return ref
 }
+
+func GetArPackagesElement(node *etree.Element) (*etree.Element, error) {
+	arpackagesElement := node.SelectElement("AR-PACKAGES")
+	if arpackagesElement == nil {
+		return nil, fmt.Errorf("no AR-PACKAGES found")
+	}
+	return arpackagesElement, nil
+}

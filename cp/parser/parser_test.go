@@ -21,4 +21,6 @@ func TestParser(t *testing.T) {
 	fmt.Println(string(v))
 	fmt.Println(p.topologyParser.GetServiceIDMap())
 	fmt.Println(p.topologyParser.GetHeaderRef())
+	fmt.Println(p.topologyParser.GetPDUTriggeringRef())
+	fmt.Println(p.communicationParser.GetPduRefMap())
 }

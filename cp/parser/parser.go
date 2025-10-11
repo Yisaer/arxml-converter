@@ -5,6 +5,7 @@ import (
 
 	"github.com/beevik/etree"
 
+	"github.com/yisaer/arxml-converter/cp/parser/communication"
 	"github.com/yisaer/arxml-converter/cp/parser/datatypes"
 	"github.com/yisaer/arxml-converter/cp/parser/topology"
 )
@@ -15,9 +16,11 @@ type Parser struct {
 	dataTypesElement           *etree.Element
 	dataTypeMappingSetsElement *etree.Element
 	topologyElement            *etree.Element
+	communicationElement       *etree.Element
 
-	dataTypesParser *datatypes.DataTypesParser
-	topologyParser  *topology.TopoLogyParser
+	dataTypesParser     *datatypes.DataTypesParser
+	topologyParser      *topology.TopoLogyParser
+	communicationParser *communication.CommunicationParser
 
 	dataTypeMappings map[string]string
 }
@@ -64,6 +67,10 @@ func (p *Parser) parse() error {
 	p.topologyParser = topology.NewTopoLogyParser()
 	if err := p.topologyParser.ParseTopoLogy(p.topologyElement); err != nil {
 		return fmt.Errorf("parse topology: %w", err)
+	}
+	p.communicationParser = communication.NewCommunicationParser()
+	if err := p.communicationParser.ParseCommunication(p.communicationElement); err != nil {
+		return fmt.Errorf("parse communication: %w", err)
 	}
 	return nil
 }
