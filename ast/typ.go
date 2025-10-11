@@ -1,4 +1,4 @@
-package mod
+package ast
 
 type DataType struct {
 	ShorName string `json:"short_name"`

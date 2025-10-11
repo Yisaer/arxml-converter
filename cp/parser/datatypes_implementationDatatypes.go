@@ -1,14 +1,15 @@
-package ast
+package parser
 
 import (
 	"fmt"
 
 	"github.com/beevik/etree"
 
-	"github.com/yisaer/arxml-converter/mod"
+	"github.com/yisaer/arxml-converter/ast"
+	"github.com/yisaer/arxml-converter/util"
 )
 
-func (p *DataTypesParser) parseImplementationDataTypes(root *etree.Element) error {
+func (dp *DataTypesParser) parseImplementationDataTypes(root *etree.Element) error {
 	elements := root.SelectElement("ELEMENTS")
 	if elements == nil {
 		return fmt.Errorf("no elements found")
@@ -18,15 +19,15 @@ func (p *DataTypesParser) parseImplementationDataTypes(root *etree.Element) erro
 		return fmt.Errorf("no IMPLEMENTATION-DATA-TYPE found")
 	}
 	for index, idt := range idts {
-		if err := p.parseImplementationValueDataType(idt); err != nil {
+		if err := dp.parseImplementationValueDataType(idt); err != nil {
 			return fmt.Errorf("parse %v ImplementationDataType failed, err:%v", index, err.Error())
 		}
 	}
 	return nil
 }
 
-func (p *DataTypesParser) parseImplementationValueDataType(root *etree.Element) (err error) {
-	sn, err := p.getShortname(root)
+func (dp *DataTypesParser) parseImplementationValueDataType(root *etree.Element) (err error) {
+	sn, err := util.GetShortname(root)
 	if err != nil {
 		return err
 	}
@@ -36,14 +37,14 @@ func (p *DataTypesParser) parseImplementationValueDataType(root *etree.Element) 
 		}
 	}()
 
-	category, err := p.getCategory(root)
+	category, err := util.GetCategory(root)
 	if err != nil {
 		return err
 	}
 	if category != "VALUE" {
 		return nil
 	}
-	sddpc, err := p.getSWDataDefPropsConditional(root)
+	sddpc, err := util.GetSWDataDefPropsConditional(root)
 	if err != nil {
 		return err
 	}
@@ -52,9 +53,9 @@ func (p *DataTypesParser) parseImplementationValueDataType(root *etree.Element) 
 		return fmt.Errorf("no BASE-TYPE-REF found")
 	}
 	ref := byr.Text()
-	if err := p.validBasicType(ref); err != nil {
+	if err := util.ValidBasicType(ref); err != nil {
 		return err
 	}
-	p.implementationDataTypes[sn] = mod.NewBasicDataType(sn, category, ref)
+	dp.implementationDataTypes[sn] = ast.NewBasicDataType(sn, category, ref)
 	return nil
 }

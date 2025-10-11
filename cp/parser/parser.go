@@ -1,9 +1,11 @@
-package ast
+package parser
 
 import (
 	"fmt"
 
 	"github.com/beevik/etree"
+
+	"github.com/yisaer/arxml-converter/util"
 )
 
 type Parser struct {
@@ -52,7 +54,7 @@ func (p *Parser) Parse() error {
 func (p *Parser) searchDataTypes(arPackagesElement *etree.Element) error {
 	arPackages := arPackagesElement.SelectElements("AR-PACKAGE")
 	for _, arPackage := range arPackages {
-		sn, err := p.getShortname(arPackage)
+		sn, err := util.GetShortname(arPackage)
 		if err != nil {
 			return err
 		}
@@ -67,7 +69,7 @@ func (p *Parser) searchDataTypes(arPackagesElement *etree.Element) error {
 func (p *Parser) searchDataTypeMappingSets(arPackagesElement *etree.Element) error {
 	arPackages := arPackagesElement.SelectElements("AR-PACKAGE")
 	for _, arPackage := range arPackages {
-		sn, err := p.getShortname(arPackage)
+		sn, err := util.GetShortname(arPackage)
 		if err != nil {
 			return err
 		}
