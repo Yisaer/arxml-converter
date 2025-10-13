@@ -166,7 +166,7 @@ func (t *TransformHelper) convertStructure(structData *Structure, structName str
 
 // convertRefToTypeRef 根据引用字符串转换 TypeRef
 func (t *TransformHelper) convertRefToTypeRef(ref string) (typeref.TypeRef, error) {
-	if typeRef, exists := t.convertedTypeRefs[ExtractTypeNameFromRef(ref)]; exists {
+	if typeRef, exists := t.convertedTypeRefs[strings.ToLower(ExtractTypeNameFromRef(ref))]; exists {
 		return typeRef, nil
 	}
 	return nil, fmt.Errorf("unkown ref %v", ref)
