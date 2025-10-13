@@ -1,4 +1,4 @@
-package parser
+package datatypes
 
 import (
 	"fmt"
@@ -8,7 +8,7 @@ import (
 	"github.com/yisaer/arxml-converter/util"
 )
 
-func (dp *DataTypesParser) parseDataTypes(root *etree.Element) error {
+func (dp *DataTypesParser) ParseDataTypes(root *etree.Element) error {
 	arpackagesElement := root.SelectElement("AR-PACKAGES")
 	if arpackagesElement == nil {
 		return fmt.Errorf("AR-PACKAGES element not found")

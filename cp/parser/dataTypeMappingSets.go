@@ -38,28 +38,23 @@ func (p *Parser) parseDataTypeMappingSets(node *etree.Element) error {
 	return nil
 }
 
-var (
-	appDataTypePrefix       = "/DataTypes/ApplicationDataType/"
-	implementDataTypePrefix = "/DataTypes/ImplementationDataTypes/"
-)
-
 func (p *Parser) parseSubDtm(subdtm *etree.Element) error {
 	adtr := subdtm.SelectElement("APPLICATION-DATA-TYPE-REF")
 	if adtr == nil {
 		return fmt.Errorf("no APPLICATION-DATA-TYPE-REF found")
 	}
-	if !strings.HasPrefix(adtr.Text(), appDataTypePrefix) {
+	if !strings.HasPrefix(adtr.Text(), util.AppDataTypePrefix) {
 		return fmt.Errorf("invalid APPLICATION-DATA-TYPE-REF:%v", adtr.Text())
 	}
-	adtrKey := strings.TrimPrefix(adtr.Text(), appDataTypePrefix)
+	adtrKey := strings.TrimPrefix(adtr.Text(), util.AppDataTypePrefix)
 	idtr := subdtm.SelectElement("IMPLEMENTATION-DATA-TYPE-REF")
 	if idtr == nil {
 		return fmt.Errorf("no IMPLEMENTATION-DATA-TYPE-REF found")
 	}
-	if !strings.HasPrefix(idtr.Text(), implementDataTypePrefix) {
+	if !strings.HasPrefix(idtr.Text(), util.ImplementDataTypePrefix) {
 		return fmt.Errorf("invalid IMPLEMENTATION-DATA-TYPE-REF:%v", idtr.Text())
 	}
-	idtrKey := strings.TrimPrefix(idtr.Text(), implementDataTypePrefix)
+	idtrKey := strings.TrimPrefix(idtr.Text(), util.ImplementDataTypePrefix)
 	p.dataTypeMappings[adtrKey] = idtrKey
 	return nil
 }
