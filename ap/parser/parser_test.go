@@ -7,7 +7,7 @@ import (
 )
 
 func TestParser(t *testing.T) {
-	p, err := NewParser("example.xml")
+	p, err := NewParser("../../test/s1_ap_test.xml")
 	require.NoError(t, err)
 	require.NoError(t, p.Parse())
 }
