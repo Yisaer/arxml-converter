@@ -36,15 +36,15 @@ func NewArxmlCPConverter(path string, config converter.IDlConverterConfig) (*Arx
 	}, nil
 }
 
-func (c *ArxmlCPConverter) Convert(serviceID uint16, headerID uint32, data []byte) (interface{}, error) {
-	tr, err := c.parser.FindTypeRefByID(serviceID, headerID)
+func (c *ArxmlCPConverter) Convert(serviceID uint16, headerID uint32, data []byte) (string, interface{}, error) {
+	key, tr, err := c.parser.FindTypeRefByID(serviceID, headerID)
 	if err != nil {
-		return nil, err
+		return "", nil, err
 	}
 	got, _, err := c.idlConverter.ParseDataByType(data, tr, *c.parser.GetModule())
-	return got, err
+	return key, got, err
 }
 
-func (c *ArxmlCPConverter) GetDataTypeByID(serviceID uint16, headerID uint32) (typeref.TypeRef, error) {
+func (c *ArxmlCPConverter) GetDataTypeByID(serviceID uint16, headerID uint32) (string, typeref.TypeRef, error) {
 	return c.parser.FindTypeRefByID(serviceID, headerID)
 }
