@@ -102,30 +102,30 @@ func (p *Parser) parse() error {
 	return nil
 }
 
-func (p *Parser) FindTypeRefByID(serviceID uint16, headerID uint32) (typeref.TypeRef, error) {
+func (p *Parser) FindTypeRefByID(serviceID uint16, headerID uint32) (string, typeref.TypeRef, error) {
 	serviceIDMap := p.topologyParser.GetServiceIDMap()
 	_, ok := serviceIDMap[serviceID]
 	if !ok {
-		return nil, fmt.Errorf("no service found for %d", serviceID)
+		return "", nil, fmt.Errorf("no service found for %d", serviceID)
 	}
 	headerIDMap := p.topologyParser.GetHeaderRef()
 	pduRef, ok := headerIDMap[headerID]
 	if !ok {
-		return nil, fmt.Errorf("no header ref for %d", headerID)
+		return "", nil, fmt.Errorf("no header ref for %d", headerID)
 	}
 	pduTriggeringRef := p.topologyParser.GetPDUTriggeringRef()
 	pduTriggering, ok := pduTriggeringRef[extractLast(pduRef)]
 	if !ok {
-		return nil, fmt.Errorf("no pdu triggered for %v", pduRef)
+		return "", nil, fmt.Errorf("no pdu triggered for %v", pduRef)
 	}
 	communicationPDURefMap := p.communicationParser.GetPduRefMap()
 	communicationPduRef, ok := communicationPDURefMap[extractLast(pduTriggering)]
 	if !ok {
-		return nil, fmt.Errorf("no pdu triggering ref for %v", pduTriggering)
+		return "", nil, fmt.Errorf("no pdu triggering ref for %v", pduTriggering)
 	}
 	systemSignalRef, ok := p.communicationParser.GetSignalRefMap()[extractLast(communicationPduRef)]
 	if !ok {
-		return nil, fmt.Errorf("no signal ref for %v", communicationPduRef)
+		return "", nil, fmt.Errorf("no signal ref for %v", communicationPduRef)
 	}
 
 	find := false
@@ -137,22 +137,22 @@ func (p *Parser) FindTypeRefByID(serviceID uint16, headerID uint32) (typeref.Typ
 		}
 	}
 	if !find {
-		return nil, fmt.Errorf("no operation ref for %v", communicationPduRef)
+		return "", nil, fmt.Errorf("no operation ref for %v", communicationPduRef)
 	}
 	InterfaceRefMap := p.softwareTypesParser.GetInterfaceRefMap()
 	interfaceKey, err := extractLast2(operationRef)
 	if err != nil {
-		return nil, err
+		return "", nil, err
 	}
 	InterfaceRef, ok := InterfaceRefMap[interfaceKey]
 	if !ok {
-		return nil, fmt.Errorf("no interface ref for %v", operationRef)
+		return "", nil, fmt.Errorf("no interface ref for %v", operationRef)
 	}
 	tr, ok := p.transformer.GetConverterRef()[strings.ToLower(extractLast(InterfaceRef))]
 	if !ok {
-		return nil, fmt.Errorf("no converter ref for %v", InterfaceRef)
+		return "", nil, fmt.Errorf("no converter ref for %v", InterfaceRef)
 	}
-	return tr, nil
+	return extractLast(InterfaceRef), tr, nil
 }
 
 func (p *Parser) GetModule() *idlAst.Module {
