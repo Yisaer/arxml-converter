@@ -38,13 +38,22 @@ type Parser struct {
 	idlModule   *idlAst.Module
 }
 
+func NewParserWithDoc(doc *etree.Document) *Parser {
+	p := &Parser{
+		Doc:              doc,
+		dataTypeMappings: make(map[string]string),
+	}
+	return p
+}
+
 func NewParser(path string) (*Parser, error) {
 	doc := etree.NewDocument()
 	if err := doc.ReadFromFile(path); err != nil {
 		return nil, err
 	}
 	p := &Parser{
-		Path: path, Doc: doc,
+		Path:             path,
+		Doc:              doc,
 		dataTypeMappings: make(map[string]string),
 	}
 	return p, nil

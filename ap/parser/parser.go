@@ -20,6 +20,14 @@ type Parser struct {
 	Services   map[int]*Service
 }
 
+func NewParserWithDoc(doc *etree.Document) (*Parser, error) {
+	p := &Parser{Doc: doc}
+	p.Interfaces = make(map[string]*ServiceInterface)
+	p.DataTypes = make(map[string]*ast.DataType)
+	p.Services = make(map[int]*Service)
+	return p, nil
+}
+
 func NewParser(path string) (*Parser, error) {
 	doc := etree.NewDocument()
 	if err := doc.ReadFromFile(path); err != nil {
