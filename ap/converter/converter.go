@@ -3,6 +3,7 @@ package converter
 import (
 	"fmt"
 
+	"github.com/beevik/etree"
 	idlAst "github.com/yisaer/idl-parser/ast"
 	"github.com/yisaer/idl-parser/ast/typeref"
 	"github.com/yisaer/idl-parser/converter"
@@ -16,6 +17,30 @@ type ArXMLConverter struct {
 	idlModule    *idlAst.Module
 	idlConverter *converter.IDLConverter
 	transformer  *ast.TransformHelper
+}
+
+func NewConverterWithDoc(doc *etree.Document, config converter.IDlConverterConfig) (*ArXMLConverter, error) {
+	parser, err := parser.NewParserWithDoc(doc)
+	if err != nil {
+		return nil, err
+	}
+	c := &ArXMLConverter{
+		Parser: parser,
+	}
+	if err := c.Parser.Parse(); err != nil {
+		return nil, err
+	}
+	transformerHelper := ast.NewTransformHelper(c.Parser.DataTypes)
+	c.transformer = transformerHelper
+	c.idlModule, err = c.transformer.TransformIntoModule()
+	if err != nil {
+		return nil, err
+	}
+	c.idlConverter, err = converter.NewIDLConverterWithModule(config, *c.idlModule)
+	if err != nil {
+		return nil, err
+	}
+	return c, nil
 }
 
 func NewConverter(path string, config converter.IDlConverterConfig) (*ArXMLConverter, error) {
