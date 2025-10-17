@@ -32,27 +32,22 @@ func (dp *DataTypesParser) GetApplicationDataTypes() map[string]*ast.DataType {
 	return dp.applicationDataTypes
 }
 
-func (dp *DataTypesParser) parseApplicationDatatypes(root *etree.Element) error {
-	elements, err := util.GetElements(root)
-	if err != nil {
-		return err
-	}
-	for index, apdt := range elements.SelectElements("APPLICATION-PRIMITIVE-DATA-TYPE") {
+func (dp *DataTypesParser) parseApplicationDatatypes(node *etree.Element) error {
+	for index, apdt := range node.FindElements("//APPLICATION-PRIMITIVE-DATA-TYPE") {
 		if err := dp.ParseApplicationDataType(apdt); err != nil {
 			return fmt.Errorf("parse index %v APPLICATION-PRIMITIVE-DATA-TYPE failed, err:%v", index, err.Error())
 		}
 	}
-	for index, aadt := range elements.SelectElements("APPLICATION-ARRAY-DATA-TYPE") {
+	for index, aadt := range node.FindElements("//APPLICATION-ARRAY-DATA-TYPE") {
 		if err := dp.ParseApplicationDataType(aadt); err != nil {
 			return fmt.Errorf("parse index %v APPLICATION-ARRAY-DATA-TYPE failed, err:%v", index, err.Error())
 		}
 	}
-	for index, ardt := range elements.SelectElements("APPLICATION-RECORD-DATA-TYPE") {
+	for index, ardt := range node.FindElements("//APPLICATION-RECORD-DATA-TYPE") {
 		if err := dp.ParseApplicationDataType(ardt); err != nil {
 			return fmt.Errorf("parse index %v APPLICATION-RECORD-DATA-TYPE failed, err:%v", index, err.Error())
 		}
 	}
-
 	return nil
 }
 

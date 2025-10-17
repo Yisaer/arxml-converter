@@ -4,8 +4,6 @@ import (
 	"fmt"
 
 	"github.com/beevik/etree"
-
-	"github.com/yisaer/arxml-converter/util"
 )
 
 func (dp *DataTypesParser) ParseDataTypes(root *etree.Element) error {
@@ -13,30 +11,10 @@ func (dp *DataTypesParser) ParseDataTypes(root *etree.Element) error {
 	if arpackagesElement == nil {
 		return fmt.Errorf("AR-PACKAGES element not found")
 	}
-	arpackages := arpackagesElement.SelectElements("AR-PACKAGE")
-	for index, arpkg := range arpackages {
-		shortname, err := util.GetShortname(arpkg)
-		if err != nil {
-			return fmt.Errorf("could not get short name for ar-packages[%d]", index)
-		}
-		switch shortname {
-		case "ImplementationDataTypes":
-			dp.implementationDataTypesArPackage = arpkg
-		case "ApplicationDataType":
-			dp.applicationDatatypeArPackage = arpkg
-		}
-	}
-	if dp.implementationDataTypesArPackage == nil {
-		return fmt.Errorf("no implementationDataTypes found in AR-PACKAGES")
-	}
-	if dp.applicationDatatypeArPackage == nil {
-		return fmt.Errorf("no applicationDataTypes found in AR-PACKAGES")
-	}
-
-	if err := dp.parseImplementationDataTypes(dp.implementationDataTypesArPackage); err != nil {
+	if err := dp.parseImplementationDataTypes(arpackagesElement); err != nil {
 		return fmt.Errorf("parse ImplementationDataTypes failed, err:%v", err.Error())
 	}
-	if err := dp.parseApplicationDatatypes(dp.applicationDatatypeArPackage); err != nil {
+	if err := dp.parseApplicationDatatypes(arpackagesElement); err != nil {
 		return fmt.Errorf("parse application data types: %w", err)
 	}
 	return nil
