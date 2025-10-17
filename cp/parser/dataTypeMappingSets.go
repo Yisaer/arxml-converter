@@ -2,7 +2,6 @@ package parser
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/beevik/etree"
 
@@ -43,18 +42,12 @@ func (p *Parser) parseSubDtm(subdtm *etree.Element) error {
 	if adtr == nil {
 		return fmt.Errorf("no APPLICATION-DATA-TYPE-REF found")
 	}
-	if !strings.HasPrefix(adtr.Text(), util.AppDataTypePrefix) {
-		return fmt.Errorf("invalid APPLICATION-DATA-TYPE-REF:%v", adtr.Text())
-	}
-	adtrKey := strings.TrimPrefix(adtr.Text(), util.AppDataTypePrefix)
+	adtrKey := extractLast(adtr.Text())
 	idtr := subdtm.SelectElement("IMPLEMENTATION-DATA-TYPE-REF")
 	if idtr == nil {
 		return fmt.Errorf("no IMPLEMENTATION-DATA-TYPE-REF found")
 	}
-	if !strings.HasPrefix(idtr.Text(), util.ImplementDataTypePrefix) {
-		return fmt.Errorf("invalid IMPLEMENTATION-DATA-TYPE-REF:%v", idtr.Text())
-	}
-	idtrKey := strings.TrimPrefix(idtr.Text(), util.ImplementDataTypePrefix)
+	idtrKey := extractLast(idtr.Text())
 	p.dataTypeMappings[adtrKey] = idtrKey
 	return nil
 }
