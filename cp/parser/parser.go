@@ -149,19 +149,23 @@ func (p *Parser) FindTypeRefByID(serviceID uint16, headerID uint32) (string, typ
 		return "", nil, fmt.Errorf("no operation ref for %v", communicationPduRef)
 	}
 	InterfaceRefMap := p.softwareTypesParser.GetInterfaceRefMap()
-	interfaceKey, err := extractLast2(operationRef)
+	csiKey, csoKey, err := extractLast2(operationRef)
 	if err != nil {
 		return "", nil, err
 	}
-	InterfaceRef, ok := InterfaceRefMap[interfaceKey]
+	csoMap, ok := InterfaceRefMap[csiKey]
 	if !ok {
 		return "", nil, fmt.Errorf("no interface ref for %v", operationRef)
 	}
-	tr, ok := p.transformer.GetConverterRef()[strings.ToLower(extractLast(InterfaceRef))]
+	tRef, ok := csoMap[csoKey]
 	if !ok {
-		return "", nil, fmt.Errorf("no converter ref for %v", InterfaceRef)
+		return "", nil, fmt.Errorf("no interface ref for %v", operationRef)
 	}
-	return extractLast(InterfaceRef), tr, nil
+	tr, ok := p.transformer.GetConverterRef()[strings.ToLower(extractLast(tRef))]
+	if !ok {
+		return "", nil, fmt.Errorf("no converter ref for %v", tRef)
+	}
+	return extractLast(tRef), tr, nil
 }
 
 func (p *Parser) GetModule() *idlAst.Module {
@@ -176,10 +180,10 @@ func extractLast(ref string) string {
 	return ref
 }
 
-func extractLast2(ref string) (string, error) {
+func extractLast2(ref string) (string, string, error) {
 	parts := strings.Split(ref, "/")
 	if len(parts) > 1 {
-		return parts[len(parts)-2], nil
+		return parts[len(parts)-2], parts[len(parts)-1], nil
 	}
-	return "", fmt.Errorf("no last 2 element in %v", ref)
+	return "", "", fmt.Errorf("no last 2 element in %v", ref)
 }

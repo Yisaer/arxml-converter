@@ -118,9 +118,18 @@ func (dp *DataTypesParser) ParseApplicationDataType(root *etree.Element) (err er
 			return err
 		}
 		if !isDynamicArray {
-			return fmt.Errorf("fixed length array not supported now")
+			numberLengthElement := element.SelectElement("MAX-NUMBER-OF-ELEMENTS")
+			if numberLengthElement == nil {
+				return fmt.Errorf("no MAX-NUMBER-OF-ELEMENTS found")
+			}
+			length, err := util.ToInt64(numberLengthElement.Text())
+			if err != nil {
+				return fmt.Errorf("invalid MAX-NUMBER-OF-ELEMENTS element:%v", numberLengthElement.Text())
+			}
+			dp.applicationDataTypes[sn] = ast.NewArrayDataType(sn, category, arrayRef, length)
+		} else {
+			dp.applicationDataTypes[sn] = ast.NewArrayDataType(sn, category, arrayRef, 0)
 		}
-		dp.applicationDataTypes[sn] = ast.NewArrayDataType(sn, category, arrayRef, 0)
 	case "STRUCTURE":
 		elements := root.SelectElement("ELEMENTS")
 		if elements == nil {

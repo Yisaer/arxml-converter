@@ -9,18 +9,17 @@ import (
 )
 
 type SoftwareTypesParser struct {
-	interfacesElement                *etree.Element
-	interfaceRefMap                  map[string]string
-	directionInArgumentDataPrototype *etree.Element
+	interfacesElement *etree.Element
+	interfaceRefMap   map[string]map[string]string
 }
 
 func NewSoftwareTypesParser() *SoftwareTypesParser {
 	return &SoftwareTypesParser{
-		interfaceRefMap: make(map[string]string),
+		interfaceRefMap: make(map[string]map[string]string),
 	}
 }
 
-func (sp *SoftwareTypesParser) GetInterfaceRefMap() map[string]string {
+func (sp *SoftwareTypesParser) GetInterfaceRefMap() map[string]map[string]string {
 	return sp.interfaceRefMap
 }
 
@@ -52,14 +51,14 @@ func (sp *SoftwareTypesParser) parseInterfaces(node *etree.Element) error {
 	}
 	clientServerInterfaceList := elements.SelectElements("CLIENT-SERVER-INTERFACE")
 	for index, clientServerInterfaceElement := range clientServerInterfaceList {
-		if err := sp.searchClientServerInterface(clientServerInterfaceElement); err != nil {
+		if err := sp.parseClientServerInterface(clientServerInterfaceElement); err != nil {
 			return fmt.Errorf("parsing %v client server interface : %w", index, err)
 		}
 	}
 	return nil
 }
 
-func (sp *SoftwareTypesParser) searchClientServerInterface(node *etree.Element) (err error) {
+func (sp *SoftwareTypesParser) parseClientServerInterface(node *etree.Element) (err error) {
 	sn, err := util.GetShortname(node)
 	if err != nil {
 		return err
@@ -73,42 +72,55 @@ func (sp *SoftwareTypesParser) searchClientServerInterface(node *etree.Element) 
 	if operationsElement == nil {
 		return nil
 	}
-	clientServerOperation := operationsElement.SelectElement("CLIENT-SERVER-OPERATION")
-	if clientServerOperation == nil {
-		return nil
+	for index, cso := range operationsElement.SelectElements("CLIENT-SERVER-OPERATION") {
+		csoShortName, tref, err := sp.parseClientServerOperation(cso)
+		if err != nil {
+			return fmt.Errorf("parsing %v client server operation: %w", index, err)
+		}
+		sp.addClientServerInterfaceMap(sn, csoShortName, tref)
 	}
-	return sp.parseClientServerOperation(sn, clientServerOperation)
-}
-
-func (sp *SoftwareTypesParser) parseClientServerOperation(sn string, node *etree.Element) (err error) {
-	argumentsElement := node.SelectElement("ARGUMENTS")
-	if argumentsElement == nil {
-		return nil
-	}
-	argumentDataProtoTypeList := argumentsElement.SelectElements("ARGUMENT-DATA-PROTOTYPE")
-	if err := sp.searchDirectionINArgument(argumentDataProtoTypeList); err != nil {
-		return err
-	}
-	typeRefElement := sp.directionInArgumentDataPrototype.SelectElement("TYPE-TREF")
-	if typeRefElement == nil {
-		return fmt.Errorf("no type reference element found for %v in argument direction in", sn)
-	}
-	sp.interfaceRefMap[sn] = typeRefElement.Text()
 	return nil
 }
 
-func (sp *SoftwareTypesParser) searchDirectionINArgument(argumentDataProtoTypeList []*etree.Element) error {
-	for _, argumentDataProtoTypeElement := range argumentDataProtoTypeList {
-		DIRECTIONElement := argumentDataProtoTypeElement.SelectElement("DIRECTION")
+func (sp *SoftwareTypesParser) addClientServerInterfaceMap(csiShortname, csoShortname, tref string) {
+	csoMap, ok := sp.interfaceRefMap[csiShortname]
+	if !ok {
+		csoMap = make(map[string]string)
+		sp.interfaceRefMap[csiShortname] = csoMap
+	}
+	csoMap[csoShortname] = tref
+	sp.interfaceRefMap[csiShortname] = csoMap
+}
+
+func (sp *SoftwareTypesParser) parseClientServerOperation(node *etree.Element) (shortname, tref string, err error) {
+	sn, err := util.GetShortname(node)
+	if err != nil {
+		return "", "", err
+	}
+	defer func() {
+		if err != nil {
+			err = fmt.Errorf("parsing client server operation %v: %w", sn, err)
+		}
+	}()
+
+	argumentsElement := node.SelectElement("ARGUMENTS")
+	if argumentsElement == nil {
+		return "", "", nil
+	}
+	for index, argument := range argumentsElement.SelectElements("ARGUMENT-DATA-PROTOTYPE") {
+		DIRECTIONElement := argument.SelectElement("DIRECTION")
 		if DIRECTIONElement == nil {
-			return nil
+			continue
 		}
 		if DIRECTIONElement.Text() == "IN" {
-			sp.directionInArgumentDataPrototype = argumentDataProtoTypeElement
-			return nil
+			typeRefElement := argument.SelectElement("TYPE-TREF")
+			if typeRefElement == nil {
+				return "", "", fmt.Errorf("parsing %v ARGUMENT-DATA-PROTOTYPE no TYPE-TREF", index)
+			}
+			return sn, typeRefElement.Text(), nil
 		}
 	}
-	return fmt.Errorf("no DIRECTION IN argument found")
+	return "", "", nil
 }
 
 func (sp *SoftwareTypesParser) searchInterfaces(arpackageList []*etree.Element) error {

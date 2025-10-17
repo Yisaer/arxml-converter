@@ -22,6 +22,14 @@ func ToUint32(raw string) (uint32, error) {
 	return uint32(val), nil
 }
 
+func ToInt64(raw string) (int64, error) {
+	val, err := strconv.ParseUint(raw, 10, 64)
+	if err != nil {
+		return 0, fmt.Errorf("cannot convert %s to uint32, err:%v", raw, err.Error())
+	}
+	return int64(val), nil
+}
+
 func ExtractLast(ref string) string {
 	parts := strings.Split(ref, "/")
 	if len(parts) > 0 {
