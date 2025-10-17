@@ -117,7 +117,7 @@ func (dp *DataTypesParser) ParseApplicationDataType(root *etree.Element) (err er
 		if typeRef == nil {
 			return fmt.Errorf("no TYPE-TREF found for sn %v", sn)
 		}
-		arrayRef := strings.TrimPrefix(typeRef.Text(), util.AppDataTypePrefix)
+		arrayRef := util.ExtractLast(typeRef.Text())
 		isDynamicArray, err := util.GetArraySizeSemantics(element)
 		if err != nil {
 			return err
@@ -146,7 +146,7 @@ func (dp *DataTypesParser) ParseApplicationDataType(root *etree.Element) (err er
 			if typeRef == nil {
 				return fmt.Errorf("no TYPE-REF found for sn %v", recordSN)
 			}
-			ref.Ref = strings.TrimPrefix(typeRef.Text(), util.AppDataTypePrefix)
+			ref.Ref = util.ExtractLast(typeRef.Text())
 			s.STRList = append(s.STRList, ref)
 		}
 		dp.applicationDataTypes[sn] = ast.NewStructureDataType(sn, category, s)
