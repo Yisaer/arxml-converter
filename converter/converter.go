@@ -9,6 +9,7 @@ import (
 
 	apconverter "github.com/yisaer/arxml-converter/ap/converter"
 	cpconverter "github.com/yisaer/arxml-converter/cp/converter"
+	"github.com/yisaer/arxml-converter/util"
 )
 
 type AutosarXsdVersion int
@@ -41,19 +42,30 @@ func NewConverter(path string, config converter.IDlConverterConfig) (*ArxmlConve
 	if err := c.parseXML(path); err != nil {
 		return nil, err
 	}
-	switch c.version {
-	case AUTOSAR_00048Version:
-		c.apArxmlConverter, err = apconverter.NewConverterWithDoc(doc, config)
-		if err != nil {
-			return nil, err
-		}
-	case AUTOSAR_4_2_2Version:
+	isCp, err1 := c.IsCP()
+	if err1 != nil {
+		return nil, err1
+	}
+	isAp, err2 := c.IsAP()
+	if err2 != nil {
+		return nil, err2
+	}
+	if isCp {
 		c.cpArxmlConverter, err = cpconverter.NewArxmlCPConverterWithDoc(doc, config)
 		if err != nil {
 			return nil, err
 		}
+		return c, nil
 	}
-	return c, nil
+	if isAp {
+		c.apArxmlConverter, err = apconverter.NewConverterWithDoc(doc, config)
+		if err != nil {
+			return nil, err
+		}
+		return c, nil
+	}
+
+	return nil, fmt.Errorf("target arxml isn't cp or ap")
 }
 
 func (c *ArxmlConverter) Decode(serviceID uint16, eventID uint16, data []byte) (string, interface{}, error) {
@@ -96,4 +108,99 @@ func (c *ArxmlConverter) parseXML(path string) error {
 		return fmt.Errorf("unkown schema location %s", schemaLocationValue)
 	}
 	return nil
+}
+
+func (c *ArxmlConverter) IsAP() (bool, error) {
+	autosarElement := c.doc.SelectElement("AUTOSAR")
+	if autosarElement == nil {
+		return false, nil
+	}
+	var interfacesElement *etree.Element
+	var datatypes *etree.Element
+	var IAUTOSAR *etree.Element
+	arpList := autosarElement.SelectElements("AR-PACKAGES")
+	for _, arg := range arpList {
+		sn, err := util.GetShortname(arg)
+		if err != nil {
+			return false, err
+		}
+		switch sn {
+		case "interfaces":
+			interfacesElement = arg
+		case "datatypes":
+			datatypes = arg
+		case "AUTOSAR":
+			IAUTOSAR = arg
+		}
+	}
+	if interfacesElement == nil {
+		return false, nil
+	}
+	if datatypes == nil {
+		return false, nil
+	}
+	if IAUTOSAR == nil {
+		return false, nil
+	}
+	return true, nil
+}
+
+func (c *ArxmlConverter) IsCP() (bool, error) {
+	autosarElement := c.doc.SelectElement("AUTOSAR")
+	if autosarElement == nil {
+		return false, nil
+	}
+	var DataTypes *etree.Element
+	var Communication *etree.Element
+	var SoftwareTypes *etree.Element
+	var SoAdRoutingGroups *etree.Element
+	var System *etree.Element
+	var Topology *etree.Element
+	var DataTypeMappingSets *etree.Element
+	arpList := autosarElement.SelectElements("AR-PACKAGES")
+	for _, arg := range arpList {
+		sn, err := util.GetShortname(arg)
+		if err != nil {
+			return false, err
+		}
+		switch sn {
+		case "DataTypes":
+			DataTypes = arg
+		case "Communication":
+			Communication = arg
+		case "SoftwareTypes":
+			SoftwareTypes = arg
+		case "SoAdRoutingGroups":
+			SoAdRoutingGroups = arg
+		case "System":
+			System = arg
+		case "Topology":
+			Topology = arg
+		case "DataTypeMappingSets":
+			DataTypeMappingSets = arg
+
+		}
+	}
+	if DataTypes == nil {
+		return false, nil
+	}
+	if Communication == nil {
+		return false, nil
+	}
+	if SoftwareTypes == nil {
+		return false, nil
+	}
+	if SoAdRoutingGroups == nil {
+		return false, nil
+	}
+	if System == nil {
+		return false, nil
+	}
+	if Topology == nil {
+		return false, nil
+	}
+	if DataTypeMappingSets == nil {
+		return false, nil
+	}
+	return true, nil
 }
