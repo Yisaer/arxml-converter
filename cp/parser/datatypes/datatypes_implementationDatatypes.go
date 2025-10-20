@@ -9,16 +9,8 @@ import (
 	"github.com/yisaer/arxml-converter/util"
 )
 
-func (dp *DataTypesParser) parseImplementationDataTypes(root *etree.Element) error {
-	elements := root.SelectElement("ELEMENTS")
-	if elements == nil {
-		return fmt.Errorf("no elements found")
-	}
-	idts := elements.SelectElements("IMPLEMENTATION-DATA-TYPE")
-	if len(idts) < 1 {
-		return fmt.Errorf("no IMPLEMENTATION-DATA-TYPE found")
-	}
-	for index, idt := range idts {
+func (dp *DataTypesParser) parseImplementationDataTypes(node *etree.Element) error {
+	for index, idt := range node.FindElements("//IMPLEMENTATION-DATA-TYPE") {
 		if err := dp.parseImplementationValueDataType(idt); err != nil {
 			return fmt.Errorf("parse %v ImplementationDataType failed, err:%v", index, err.Error())
 		}

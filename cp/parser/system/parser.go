@@ -40,9 +40,17 @@ func (sp *SystemParser) ParseSystem(node *etree.Element) (err error) {
 	if err != nil {
 		return err
 	}
-	if systemSN != "SystemDescription" {
-		return fmt.Errorf("system shortname is not SystemDescription, got %s", systemSN)
+	if systemSN == "SystemDescription" {
+		return sp.parseSystemMapping(systemElement)
 	}
+	categoryElement := systemElement.SelectElement("CATEGORY")
+	if categoryElement != nil && categoryElement.Text() == "SYSTEM_DESCRIPTION" {
+		return sp.parseSystemMapping(systemElement)
+	}
+	return fmt.Errorf("unsupported system type: %s", systemSN)
+}
+
+func (sp *SystemParser) parseSystemMapping(systemElement *etree.Element) (err error) {
 	mappingsElement := systemElement.SelectElement("MAPPINGS")
 	if mappingsElement == nil {
 		return fmt.Errorf("no mappings")
