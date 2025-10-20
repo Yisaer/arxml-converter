@@ -161,7 +161,7 @@ func (tp *TopoLogyParser) parseSOCKETCONNECTIONIPDUIDENTIFIER(node *etree.Elemen
 	}
 	pduTriggeringRefElement := node.SelectElement("PDU-TRIGGERING-REF")
 	pduTriggeringRefElementRaw := pduTriggeringRefElement.Text()
-	if strings.Contains(pduTriggeringRefElementRaw, "call") {
+	if !strings.Contains(pduTriggeringRefElementRaw, "return") {
 		tp.headerIdRef[headerID] = pduTriggeringRefElementRaw
 	}
 	return nil

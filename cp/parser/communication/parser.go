@@ -143,6 +143,7 @@ func (p *CommunicationParser) parseISignal(node *etree.Element) error {
 	if systemSignalRefElement == nil {
 		return nil
 	}
-	p.signalRef[sn] = systemSignalRefElement.Text()
+	a := systemSignalRefElement.Text()
+	p.signalRef[sn] = a
 	return nil
 }

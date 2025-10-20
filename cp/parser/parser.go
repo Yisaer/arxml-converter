@@ -139,8 +139,9 @@ func (p *Parser) FindTypeRefByID(serviceID uint16, headerID uint32) (string, typ
 
 	find := false
 	operationRef := ""
-	for k, v := range p.systemParser.GetOperationRef() {
-		if strings.HasSuffix(k, systemSignalRef) {
+	orMap := p.systemParser.GetOperationRef()
+	for k, v := range orMap {
+		if k == systemSignalRef {
 			find = true
 			operationRef = v
 		}

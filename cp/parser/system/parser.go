@@ -67,7 +67,13 @@ func (sp *SystemParser) parseSystemMapping(systemElement *etree.Element) (err er
 	clientServerToSignalMappingList := dataMappingsElement.SelectElements("CLIENT-SERVER-TO-SIGNAL-MAPPING")
 	for index, clientServerToSignalMappingElement := range clientServerToSignalMappingList {
 		if err := sp.parseCLIENTSERVERTOSIGNALMAPPING(clientServerToSignalMappingElement); err != nil {
-			return fmt.Errorf("parse %v CLIENTSERVERTOSIGNALMAPPING error: %s", index, err.Error())
+			return fmt.Errorf("parse %v CLIENT-SERVER-TO-SIGNAL-MAPPING error: %s", index, err.Error())
+		}
+	}
+	SENDERRECEIVERTOSIGNALMAPPINGList := dataMappingsElement.SelectElements("SENDER-RECEIVER-TO-SIGNAL-MAPPING")
+	for index, SENDERRECEIVERTOSIGNALMAPPINGElement := range SENDERRECEIVERTOSIGNALMAPPINGList {
+		if err := sp.paraseSENDERRECEIVERTOSIGNALMAPPING(SENDERRECEIVERTOSIGNALMAPPINGElement); err != nil {
+			return fmt.Errorf("parse %v SENDER-RECEIVER-TO-SIGNAL-MAPPING error: %s", index, err.Error())
 		}
 	}
 	return nil
@@ -86,6 +92,24 @@ func (sp *SystemParser) parseCLIENTSERVERTOSIGNALMAPPING(node *etree.Element) (e
 	if targetOperationRefElement == nil {
 		return nil
 	}
-	sp.operationRef[callSignalRefElement.Text()] = targetOperationRefElement.Text()
+	a := targetOperationRefElement.Text()
+	sp.operationRef[callSignalRefElement.Text()] = a
+	return nil
+}
+
+func (sp *SystemParser) paraseSENDERRECEIVERTOSIGNALMAPPING(node *etree.Element) (err error) {
+	srElement := node.SelectElement("SYSTEM-SIGNAL-REF")
+	if srElement == nil {
+		return nil
+	}
+	DATAELEMENTIREF := node.SelectElement("DATA-ELEMENT-IREF")
+	if DATAELEMENTIREF == nil {
+		return nil
+	}
+	TARGETDATAPROTOTYPEREF := DATAELEMENTIREF.SelectElement("TARGET-DATA-PROTOTYPE-REF")
+	if TARGETDATAPROTOTYPEREF == nil {
+		return nil
+	}
+	sp.operationRef[srElement.Text()] = TARGETDATAPROTOTYPEREF.Text()
 	return nil
 }

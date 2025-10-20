@@ -37,3 +37,22 @@ func ExtractLast(ref string) string {
 	}
 	return ref
 }
+
+func MergeUint16ToUint32(high16, low16 uint16) uint32 {
+	return uint32(high16)<<16 | uint32(low16)
+}
+
+func MergeHexUint16ToUint32(svcHex, eventHex string) (uint16, uint32, error) {
+	s1, err := strconv.ParseUint(svcHex, 0, 16)
+	if err != nil {
+		return 0, 0, err
+	}
+	svcID := uint16(s1)
+
+	e1, err := strconv.ParseUint(eventHex, 0, 16)
+	if err != nil {
+		return 0, 0, err
+	}
+	eventID := uint16(e1)
+	return svcID, MergeUint16ToUint32(svcID, eventID), nil
+}
