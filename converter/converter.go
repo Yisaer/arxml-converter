@@ -129,7 +129,11 @@ func (c *ArxmlConverter) IsAP() (bool, error) {
 	var interfacesElement *etree.Element
 	var datatypes *etree.Element
 	var IAUTOSAR *etree.Element
-	arpList := autosarElement.SelectElements("AR-PACKAGES")
+	arpackagesElement := autosarElement.SelectElement("AR-PACKAGES")
+	if arpackagesElement == nil {
+		return false, nil
+	}
+	arpList := arpackagesElement.SelectElements("AR-PACKAGE")
 	for _, arg := range arpList {
 		sn, err := util.GetShortname(arg)
 		if err != nil {
@@ -168,11 +172,15 @@ func (c *ArxmlConverter) IsCP() (bool, error) {
 	var System *etree.Element
 	var Topology *etree.Element
 	var DataTypeMappingSets *etree.Element
-	arpList := autosarElement.SelectElements("AR-PACKAGES")
+	arpackagesElement := autosarElement.SelectElement("AR-PACKAGES")
+	if arpackagesElement == nil {
+		return false, nil
+	}
+	arpList := arpackagesElement.SelectElements("AR-PACKAGE")
 	for _, arg := range arpList {
 		sn, err := util.GetShortname(arg)
 		if err != nil {
-			return false, err
+			continue
 		}
 		switch sn {
 		case "DataTypes":
