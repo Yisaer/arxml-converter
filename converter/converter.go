@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/beevik/etree"
+	"github.com/yisaer/idl-parser/ast/typeref"
 	"github.com/yisaer/idl-parser/converter"
 
 	apconverter "github.com/yisaer/arxml-converter/ap/converter"
@@ -66,6 +67,16 @@ func NewConverter(path string, config converter.IDlConverterConfig) (*ArxmlConve
 	}
 
 	return nil, fmt.Errorf("target arxml isn't cp or ap")
+}
+
+func (c *ArxmlConverter) GetDataTypeByID(serviceID uint16, eventID uint16) (string, typeref.TypeRef, error) {
+	if c.apArxmlConverter != nil {
+		return c.apArxmlConverter.GetTypeByID(int(serviceID), int(eventID))
+	}
+	if c.cpArxmlConverter != nil {
+		return c.cpArxmlConverter.GetDataTypeByID(serviceID, MergeUint16ToUint32(serviceID, eventID))
+	}
+	return "", nil, fmt.Errorf("target arxml isn't cp or ap")
 }
 
 func (c *ArxmlConverter) Decode(serviceID uint16, eventID uint16, data []byte) (string, interface{}, error) {
