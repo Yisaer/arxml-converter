@@ -127,7 +127,7 @@ func (c *ArxmlConverter) IsAP() (bool, error) {
 		return false, nil
 	}
 	var interfacesElement *etree.Element
-	var datatypes *etree.Element
+	var dataTypes *etree.Element
 	var IAUTOSAR *etree.Element
 	arpackagesElement := autosarElement.SelectElement("AR-PACKAGES")
 	if arpackagesElement == nil {
@@ -142,8 +142,8 @@ func (c *ArxmlConverter) IsAP() (bool, error) {
 		switch sn {
 		case "interfaces":
 			interfacesElement = arg
-		case "datatypes":
-			datatypes = arg
+		case "dataTypes":
+			dataTypes = arg
 		case "AUTOSAR":
 			IAUTOSAR = arg
 		}
@@ -151,7 +151,7 @@ func (c *ArxmlConverter) IsAP() (bool, error) {
 	if interfacesElement == nil {
 		return false, nil
 	}
-	if datatypes == nil {
+	if dataTypes == nil {
 		return false, nil
 	}
 	if IAUTOSAR == nil {
