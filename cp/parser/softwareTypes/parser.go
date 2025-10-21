@@ -55,7 +55,53 @@ func (sp *SoftwareTypesParser) parseInterfaces(node *etree.Element) error {
 			return fmt.Errorf("parsing %v client server interface : %w", index, err)
 		}
 	}
+
+	SENDERRECEIVERINTERFACEList := elements.SelectElements("SENDER-RECEIVER-INTERFACE")
+	for index, SENDERRECEIVERINTERFACEElement := range SENDERRECEIVERINTERFACEList {
+		if err := sp.parseSENDERRECEIVERINTERFACE(SENDERRECEIVERINTERFACEElement); err != nil {
+			return fmt.Errorf("parsing %v SENDERRECEIVER INTERFACE : %w", index, err)
+		}
+	}
+
 	return nil
+}
+
+func (sp *SoftwareTypesParser) parseSENDERRECEIVERINTERFACE(node *etree.Element) error {
+	sn, err := util.GetShortname(node)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if err != nil {
+			err = fmt.Errorf("searching SENDER-RECEIVER-INTERFACE %v: %w", sn, err)
+		}
+	}()
+	dataElement := node.SelectElement("DATA-ELEMENTS")
+	if dataElement == nil {
+		return nil
+	}
+	for index, VARIABLEDATAPROTOTYPE := range dataElement.SelectElements("VARIABLE-DATA-PROTOTYPE") {
+		k, v, err := sp.parseVARIABLEDATAPROTOTYPE(VARIABLEDATAPROTOTYPE)
+		if err != nil {
+			return fmt.Errorf("parsing %v VARIABLE-DATA-PROTOTYPE: %w", index, err)
+		}
+		if len(k) > 0 && len(v) > 0 {
+			sp.addClientServerInterfaceMap(sn, k, v)
+		}
+	}
+	return nil
+}
+
+func (sp *SoftwareTypesParser) parseVARIABLEDATAPROTOTYPE(node *etree.Element) (string, string, error) {
+	sn, err := util.GetShortname(node)
+	if err != nil {
+		return "", "", err
+	}
+	typeRefElement := node.SelectElement("TYPE-TREF")
+	if typeRefElement == nil {
+		return "", "", nil
+	}
+	return sn, typeRefElement.Text(), nil
 }
 
 func (sp *SoftwareTypesParser) parseClientServerInterface(node *etree.Element) (err error) {
@@ -77,7 +123,9 @@ func (sp *SoftwareTypesParser) parseClientServerInterface(node *etree.Element) (
 		if err != nil {
 			return fmt.Errorf("parsing %v client server operation: %w", index, err)
 		}
-		sp.addClientServerInterfaceMap(sn, csoShortName, tref)
+		if len(csoShortName) > 0 && len(tref) > 0 {
+			sp.addClientServerInterfaceMap(sn, csoShortName, tref)
+		}
 	}
 	return nil
 }

@@ -1,10 +1,14 @@
 package converter
 
 import (
+	"encoding/hex"
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/require"
 	"github.com/yisaer/idl-parser/converter"
+
+	"github.com/yisaer/arxml-converter/util"
 )
 
 func TestGetDataType(t *testing.T) {
@@ -23,4 +27,21 @@ func TestGetDataType(t *testing.T) {
 	key, v, err := c.Convert(33282, 2181169157, testData)
 	require.NoError(t, err)
 	require.Equal(t, "Test", v)
+}
+
+func TestGetDataType2(t *testing.T) {
+	t.Skip()
+	svcID, headerID, err := util.MergeHexUint16ToUint32("0xab02", "0x8015")
+	require.NoError(t, err)
+	c, err := NewArxmlCPConverter("../../tmp/example2.xml", converter.IDlConverterConfig{IsLittleEndian: false, LengthFieldLength: 4, PaddingLength: 4})
+	require.NoError(t, err)
+	key, tr, err := c.GetDataTypeByID(svcID, headerID)
+	require.NoError(t, err)
+	fmt.Println(key)
+	fmt.Println(tr.TypeName())
+	data, err := hex.DecodeString("000000000000000202000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000")
+	require.NoError(t, err)
+	k, _, err := c.Convert(svcID, headerID, data)
+	require.NoError(t, err)
+	fmt.Println(k)
 }

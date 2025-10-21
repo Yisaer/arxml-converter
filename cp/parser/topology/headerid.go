@@ -4,9 +4,20 @@ import (
 	"fmt"
 
 	"github.com/beevik/etree"
+
+	"github.com/yisaer/arxml-converter/util"
 )
 
 func (tp *TopoLogyParser) parseSOCKETCONNECTIONBUNDLE(node *etree.Element) (err error) {
+	sn, err := util.GetShortname(node)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if err != nil {
+			err = fmt.Errorf("parse %v SOCKETCONNECTIONBUNDLE error: %v", sn, err)
+		}
+	}()
 	bundleConnectionsElement := node.SelectElement("BUNDLED-CONNECTIONS")
 	if bundleConnectionsElement == nil {
 		return nil
