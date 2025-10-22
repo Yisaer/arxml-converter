@@ -30,7 +30,7 @@ func TestGetDataType(t *testing.T) {
 }
 
 func TestGetDataType2(t *testing.T) {
-	t.Skip()
+	//t.Skip()
 	svcID, headerID, err := util.MergeHexUint16ToUint32("0xab02", "0x8015")
 	require.NoError(t, err)
 	c, err := NewArxmlCPConverter("../../tmp/example2.xml", converter.IDlConverterConfig{IsLittleEndian: false, LengthFieldLength: 4, PaddingLength: 4})
@@ -44,4 +44,17 @@ func TestGetDataType2(t *testing.T) {
 	k, _, err := c.Convert(svcID, headerID, data)
 	require.NoError(t, err)
 	fmt.Println(k)
+}
+
+func TestGetDataType3(t *testing.T) {
+	svcID, headerID, err := util.MergeHexUint16ToUint32("0xab04", "0x8009")
+	require.NoError(t, err)
+	fmt.Println(svcID)
+	fmt.Println(headerID)
+	c, err := NewArxmlCPConverter("../../tmp/example2.xml", converter.IDlConverterConfig{IsLittleEndian: false, LengthFieldLength: 4, PaddingLength: 4})
+	require.NoError(t, err)
+	key, tr, err := c.GetDataTypeByID(svcID, headerID)
+	require.NoError(t, err)
+	fmt.Println(key)
+	fmt.Println(tr.TypeName())
 }

@@ -14,6 +14,7 @@ import (
 	"github.com/yisaer/arxml-converter/cp/parser/softwareTypes"
 	"github.com/yisaer/arxml-converter/cp/parser/system"
 	"github.com/yisaer/arxml-converter/cp/parser/topology"
+	"github.com/yisaer/arxml-converter/cp/parser/tpConfig"
 )
 
 type Parser struct {
@@ -25,12 +26,14 @@ type Parser struct {
 	communicationElement       *etree.Element
 	systemElement              *etree.Element
 	softwareTypesElement       *etree.Element
+	tpConfigElement            *etree.Element
 
 	dataTypesParser     *datatypes.DataTypesParser
 	topologyParser      *topology.TopoLogyParser
 	communicationParser *communication.CommunicationParser
 	systemParser        *system.SystemParser
 	softwareTypesParser *softwareTypes.SoftwareTypesParser
+	tpConfigParser      *tpConfig.TpConfigParser
 
 	dataTypeMappings map[string]string
 
@@ -108,6 +111,12 @@ func (p *Parser) parse() error {
 	if err := p.softwareTypesParser.ParseSoftwareTypes(p.softwareTypesElement); err != nil {
 		return fmt.Errorf("parse softwareTypes: %w", err)
 	}
+	if p.tpConfigElement != nil {
+		p.tpConfigParser = tpConfig.NewTpConfigParser()
+		if err := p.tpConfigParser.ParseTpConfig(p.tpConfigElement); err != nil {
+			return fmt.Errorf("parse tpConfig: %w", err)
+		}
+	}
 	return nil
 }
 
@@ -117,20 +126,23 @@ func (p *Parser) FindTypeRefByID(serviceID uint16, headerID uint32) (string, typ
 	if !ok {
 		return "", nil, fmt.Errorf("no service found for %d", serviceID)
 	}
-	headerIDMap := p.topologyParser.GetHeaderRef()
-	pduRef, ok := headerIDMap[headerID]
-	if !ok {
-		return "", nil, fmt.Errorf("no header ref for %d", headerID)
+	PDUTRIGGERINGREF, err := p.getPDUTRIGGERINGREFByHeaderID(headerID)
+	if err != nil {
+		return "", nil, err
 	}
-	pduTriggeringRef := p.topologyParser.GetPDUTriggeringRef()
-	pduTriggering, ok := pduTriggeringRef[extractLast(pduRef)]
-	if !ok {
-		return "", nil, fmt.Errorf("no pdu triggered for %v", pduRef)
+	ISignalIPDUShortName := PDUTRIGGERINGREF
+	tpSDURef, ok := p.getTpSDURefByPDUTRIGGERINGREF(PDUTRIGGERINGREF)
+	if ok {
+		ISignalIPDUShortName = tpSDURef
+	}
+	ISIGNALREF, err := p.getISignalRefByISignalIPDU(ISignalIPDUShortName)
+	if err != nil {
+		return "", nil, err
 	}
 	communicationPDURefMap := p.communicationParser.GetPduRefMap()
-	communicationPduRef, ok := communicationPDURefMap[extractLast(pduTriggering)]
+	communicationPduRef, ok := communicationPDURefMap[extractLast(ISIGNALREF)]
 	if !ok {
-		return "", nil, fmt.Errorf("no pdu triggering ref for %v", pduTriggering)
+		return "", nil, fmt.Errorf("no pdu triggering ref for %v", ISIGNALREF)
 	}
 	systemSignalRef, ok := p.communicationParser.GetSignalRefMap()[extractLast(communicationPduRef)]
 	if !ok {
@@ -167,6 +179,32 @@ func (p *Parser) FindTypeRefByID(serviceID uint16, headerID uint32) (string, typ
 		return "", nil, fmt.Errorf("no converter ref for %v", tRef)
 	}
 	return extractLast(tRef), tr, nil
+}
+
+func (p *Parser) getPDUTRIGGERINGREFByHeaderID(headerID uint32) (string, error) {
+	headerIDMap := p.topologyParser.GetHeaderRef()
+	pduRef, ok := headerIDMap[headerID]
+	if !ok {
+		return "", fmt.Errorf("no header ref for %d", headerID)
+	}
+	return pduRef, nil
+}
+
+func (p *Parser) getTpSDURefByPDUTRIGGERINGREF(PDUTRIGGERINGREF string) (string, bool) {
+	if p.tpConfigParser == nil {
+		return "", false
+	}
+	got, ok := p.tpConfigParser.GetTpConfigPDUMap()[PDUTRIGGERINGREF]
+	return got, ok
+}
+
+func (p *Parser) getISignalRefByISignalIPDU(shortname string) (string, error) {
+	pduTriggeringRef := p.topologyParser.GetPDUTriggeringRef()
+	ISIGNALREF, ok := pduTriggeringRef[extractLast(shortname)]
+	if !ok {
+		return "", fmt.Errorf("no pdu triggered for %v", shortname)
+	}
+	return ISIGNALREF, nil
 }
 
 func (p *Parser) GetModule() *idlAst.Module {
