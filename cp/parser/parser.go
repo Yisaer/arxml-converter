@@ -6,6 +6,7 @@ import (
 
 	"github.com/beevik/etree"
 	idlAst "github.com/yisaer/idl-parser/ast"
+	"github.com/yisaer/idl-parser/ast/struct_type"
 	"github.com/yisaer/idl-parser/ast/typeref"
 
 	"github.com/yisaer/arxml-converter/ast"
@@ -225,4 +226,16 @@ func extractLast2(ref string) (string, string, error) {
 		return parts[len(parts)-2], parts[len(parts)-1], nil
 	}
 	return "", "", fmt.Errorf("no last 2 element in %v", ref)
+}
+
+func (p *Parser) GetTargetStruct(target string) *struct_type.Struct {
+	for _, module := range p.idlModule.Content {
+		st, ok := module.(struct_type.Struct)
+		if ok {
+			if st.Name == target {
+				return &st
+			}
+		}
+	}
+	return nil
 }
