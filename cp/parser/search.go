@@ -98,6 +98,21 @@ func (p *Parser) searchSoftwareTypes(arPackagesElement *etree.Element) error {
 	return fmt.Errorf("no SoftwareTypes found")
 }
 
+func (p *Parser) searchTpConfig(arPackagesElement *etree.Element) error {
+	arPackages := arPackagesElement.SelectElements("AR-PACKAGE")
+	for _, arPackage := range arPackages {
+		sn, err := util.GetShortname(arPackage)
+		if err != nil {
+			return err
+		}
+		if sn == "TpConfig" {
+			p.tpConfigElement = arPackage
+			return nil
+		}
+	}
+	return fmt.Errorf("no TpConfig found")
+}
+
 func (p *Parser) search(arPackages *etree.Element) error {
 	if err := p.searchDataTypes(arPackages); err != nil {
 		return fmt.Errorf("search data types: %w", err)
@@ -117,5 +132,6 @@ func (p *Parser) search(arPackages *etree.Element) error {
 	if err := p.searchSoftwareTypes(arPackages); err != nil {
 		return fmt.Errorf("search software types: %w", err)
 	}
+	p.searchTpConfig(arPackages)
 	return nil
 }
